@@ -1,1 +1,1 @@
-# -Event-Calendar-Project
+# Event-Calendar-Project
