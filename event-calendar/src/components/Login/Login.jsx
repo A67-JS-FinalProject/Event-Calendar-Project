@@ -1,44 +1,65 @@
-import { useState } from "react";
+import { loginUser } from "../../services/authenticationService";
+import { useContext, useEffect, useState } from "react";
+import { getUserByEmail } from "../../services/usersService.js";
+import { AppContext } from "../../store/app.context.js";
 
-function Login() {
+const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [userCrendentials, setUserCredentials] = useState(null);
+  const { appState, setAppState } = useContext(AppContext);
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    // Handle form submission logic here
-    console.log("Email:", email);
-    console.log("Password:", password);
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    // Use state variables directly
+    setUserCredentials({ email, password });
   };
 
+  useEffect(() => {
+    const handleLogin = async () => {
+      const user = await loginUser(
+        userCrendentials.email,
+        userCrendentials.password
+      );
+      if (user === "Error") {
+        return;
+      }
+
+      const userData = await getUserByEmail(
+        userCrendentials.email,
+        user.getIdToken()
+      );
+
+      setAppState({
+        ...appState,
+        user: userCrendentials.email,
+        userData: userData,
+        token: user,
+      });
+    };
+
+    if (userCrendentials) {
+      handleLogin();
+    }
+  }, [userCrendentials]);
+
   return (
-    <div className="login-form">
-      <h2>Login</h2>
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label htmlFor="email">Email:</label>
-          <input
-            type="email"
-            id="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-        </div>
-        <div>
-          <label htmlFor="password">Password:</label>
-          <input
-            type="password"
-            id="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-        </div>
-        <button type="submit">Login</button>
-      </form>
-    </div>
+    <form onSubmit={handleLogin}>
+      <input
+        type="email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        placeholder="Email"
+      />
+      <input
+        type="password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        placeholder="Password"
+      />
+      <button type="submit">Login</button>
+    </form>
   );
-}
+};
 
 export default Login;

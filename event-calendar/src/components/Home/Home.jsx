@@ -10,7 +10,8 @@ function Home() {
             <Link to="/create-an-event">Create An Event</Link>
           </li>
           <li>
-            <Link to="/event/67c9de56ff7fc07b94f36e96">View Event</Link>
+            <Link to="/event/67c9de56ff7fc07b94f36e96">View Event</Link>{" "}
+            {/*change the id*/}
           </li>
           <li>
             <Link to="/register">Register</Link>

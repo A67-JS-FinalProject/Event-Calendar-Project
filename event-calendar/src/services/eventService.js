@@ -1,11 +1,12 @@
 const URL = `http://localhost:3000`;
 
-export const createEvent = async (event) => {
+export const createEvent = async (event, token) => {
   try {
     const response = await fetch(`${URL}/events`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify(event),
     });
