@@ -1,34 +1,26 @@
 import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import { getEventById } from "../servise/eventServise";
 
 function RenderEvent() {
+  const { id } = useParams();
   const [data, setData] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
-      const result = await getEventById(`67c9dee4ff7fc07b94f36e98`);
+      const result = await getEventById(id);
       setData(result);
     };
 
     fetchData();
-  }, []);
+  }, [id]);
+
   if (!data) {
     return <div>Loading...</div>;
   }
+
   return (
-    // title,
-    // startDate,
-    // endDate,
-    // location,
-    // description,
-    // participants,
-    // isPublic,
-    // isRecurring,
-    // coverPhoto,
-    // tags,
-    // reminders,
     <>
-      <h1 color="black">Creta</h1>
       <h2>{data.title}</h2>
       <p>{data.description}</p>
       <p>Start Date: {data.startDate}</p>
