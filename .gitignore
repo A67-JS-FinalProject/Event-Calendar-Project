@@ -22,7 +22,8 @@ lib-cov
 # Coverage directory used by tools like istanbul
 coverage
 *.lcov
-
+# Ignore Firebase Admin SDK file
+.server/firebase-admin-sdk.json
 # nyc test coverage
 .nyc_output
 

@@ -43,6 +43,7 @@ userRoutes.route("/users").post(async (req, res) => {
     let newUser = {
       name: req.body.name,
       email: req.body.email,
+      password: req.body.password, // Add password field
     };
     let result = await db.collection("users").insertOne(newUser);
     console.log("Inserted user:", newUser); // Add logging

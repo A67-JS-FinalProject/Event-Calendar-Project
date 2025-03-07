@@ -2,49 +2,52 @@ import { loginUser } from "../../services/authenticationService";
 import { useContext, useEffect, useState } from "react";
 import { getUserByEmail } from "../../services/usersService.js";
 import { AppContext } from "../../store/app.context.js";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [userCrendentials, setUserCredentials] = useState(null);
+  const [userCredentials, setUserCredentials] = useState(null);
   const { appState, setAppState } = useContext(AppContext);
+  const navigate = useNavigate();
 
-  const handleLogin = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    // Use state variables directly
     setUserCredentials({ email, password });
   };
 
   useEffect(() => {
     const handleLogin = async () => {
+      if (!userCredentials) return;
+
       const user = await loginUser(
-        userCrendentials.email,
-        userCrendentials.password
+        userCredentials.email,
+        userCredentials.password
       );
       if (user === "Error") {
         return;
       }
 
       const userData = await getUserByEmail(
-        userCrendentials.email,
+        userCredentials.email,
         user.getIdToken()
       );
 
       setAppState({
         ...appState,
-        user: userCrendentials.email,
+        user: userCredentials.email,
         userData: userData,
         token: user,
       });
+
+      navigate("/"); // Redirect to home page
     };
 
-    if (userCrendentials) {
-      handleLogin();
-    }
-  }, [userCrendentials]);
+    handleLogin();
+  }, [userCredentials]);
 
   return (
-    <form onSubmit={handleLogin}>
+    <form onSubmit={handleSubmit}>
       <input
         type="email"
         value={email}
