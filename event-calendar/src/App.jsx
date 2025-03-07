@@ -1,13 +1,11 @@
-import './App.css'
-
+import "./App.css";
+import RenderEvent from "./RenderEvent/ViewEvent";
 function App() {
- 
-
   return (
     <>
-      <h1>Event Calendar</h1>
+      <RenderEvent />
     </>
-  )
+  );
 }
 
-export default App
+export default App;
