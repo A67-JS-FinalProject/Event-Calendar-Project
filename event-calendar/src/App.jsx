@@ -1,7 +1,7 @@
 import "./App.css";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import RenderEvent from "./RenderEvent/ViewEvent";
-import CreateAnEvent from "./CreateAEvent/CreateAnEvent";
+import RenderEvent from "./components/RenderEvent/ViewEvent";
+import CreateAnEvent from "./components/CreateAEvent/CreateAnEvent";
 
 function App() {
   return (

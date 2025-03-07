@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { getEventById } from "../servise/eventServise";
+import { getEventById } from "../../services/eventServise";
 
 function RenderEvent() {
   const { id } = useParams();
