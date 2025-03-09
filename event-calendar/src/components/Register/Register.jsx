@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { registerUser } from "../../services/authenticationService";
+import { createUser } from "../../services/usersService";
 
 const Register = () => {
   const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
   const handleRegister = async (e) => {
@@ -10,14 +12,7 @@ const Register = () => {
     const user = await registerUser(email, password);
     if (user) {
       console.log("User registered:", user);
-      // Call the API to save the user email to MongoDB
-      await fetch("http://localhost:3000/users", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email }), // Only send the email
-      });
+      await createUser(email, username);
     } else {
       console.error("Registration failed");
     }
@@ -30,6 +25,12 @@ const Register = () => {
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         placeholder="Email"
+      />
+      <input
+        type="username"
+        value={username}
+        onChange={(e) => setUsername(e.target.value)}
+        placeholder="Username"
       />
       <input
         type="password"
