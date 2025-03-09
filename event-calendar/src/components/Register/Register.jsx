@@ -10,13 +10,13 @@ const Register = () => {
     const user = await registerUser(email, password);
     if (user) {
       console.log("User registered:", user);
-      // Call the API to save the user data to MongoDB
+      // Call the API to save the user email to MongoDB
       await fetch("http://localhost:3000/users", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email }), // Only send the email
       });
     } else {
       console.error("Registration failed");
