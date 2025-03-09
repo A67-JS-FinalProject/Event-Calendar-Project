@@ -4,7 +4,8 @@ import RenderEvent from "./components/RenderEvent/ViewEvent";
 import CreateAnEvent from "./components/CreateAEvent/CreateAnEvent";
 import Login from "./components/Login/Login";
 import Register from "./components/Register/Register";
-import Home from "./components/Home/Home";
+import Home from "./components/Home/Home.jsx";
+import LandingPage from "./components/Home/LadningPage.jsx";
 import { AppContext } from "./store/app.context.js";
 import { useState } from "react";
 function App() {
@@ -17,7 +18,8 @@ function App() {
     <AppContext.Provider value={{ appState, setAppState }}>
       <Router>
         <Routes>
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/home" element={<Home />} />
           <Route path="/create-an-event" element={<CreateAnEvent />} />
           <Route path="/event/:id" element={<RenderEvent />} />
           <Route path="/register" element={<Register />} />
