@@ -81,6 +81,8 @@ web_modules/
 .env.local
 config.env
 
+# Ignore firebase-admin-sdk.json
+server/firebase-admin-sdk.json
 
 # parcel-bundler cache (https://parceljs.org/)
 .cache
