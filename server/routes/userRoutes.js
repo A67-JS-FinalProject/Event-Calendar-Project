@@ -41,9 +41,8 @@ userRoutes.route("/users").post(async (req, res) => {
   try {
     let db = connectObject.getDb();
     let newUser = {
-      name: req.body.name,
       email: req.body.email,
-      password: req.body.password, // Add password field
+      username: req.body.username,
     };
     let result = await db.collection("users").insertOne(newUser);
     console.log("Inserted user:", newUser); // Add logging
@@ -59,8 +58,8 @@ userRoutes.route("/users/:id").put(async (req, res) => {
     let db = connectObject.getDb();
     let updatedUser = {
       $set: {
-        name: req.body.name,
         email: req.body.email,
+        username: req.body.username,
       },
     };
     let result = await db
