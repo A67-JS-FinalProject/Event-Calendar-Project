@@ -5,9 +5,10 @@ import CreateAnEvent from "./components/CreateAEvent/CreateAnEvent";
 import Login from "./components/Login/Login";
 import Register from "./components/Register/Register";
 import Home from "./components/Home/Home.jsx";
-import LandingPage from "./components/Home/LadningPage.jsx";
+import LandingPage from "./components/Home/LandingPage.jsx";
 import { AppContext } from "./store/app.context.js";
 import { useState } from "react";
+import Authenticated from "./hoc/authenticated.jsx";
 function App() {
   const [appState, setAppState] = useState({
     user: null,
@@ -19,7 +20,7 @@ function App() {
       <Router>
         <Routes>
           <Route path="/" element={<LandingPage />} />
-          <Route path="/home" element={<Home />} />
+          <Route path="/home" element={<Authenticated><Home /></Authenticated>} />
           <Route path="/create-an-event" element={<CreateAnEvent />} />
           <Route path="/event/:id" element={<RenderEvent />} />
           <Route path="/register" element={<Register />} />

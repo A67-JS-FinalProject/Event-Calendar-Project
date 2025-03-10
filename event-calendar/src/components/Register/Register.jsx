@@ -1,20 +1,43 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { registerUser } from "../../services/authenticationService";
 import { createUser } from "../../services/usersService";
+import { useNavigate } from "react-router-dom";
+import { AppContext } from "../../store/app.context";
+import { getIdToken } from "firebase/auth";
 
 const Register = () => {
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
+  const { setAppState } = useContext(AppContext);
+  
+  const navigate = useNavigate();
+
   const handleRegister = async (e) => {
     e.preventDefault();
-    const user = await registerUser(email, password);
-    if (user) {
-      console.log("User registered:", user);
-      await createUser(email, username);
-    } else {
-      console.error("Registration failed");
+    try {
+      const user = await registerUser(email, password);
+      console.log(user);
+  
+      const token = await getIdToken(user);
+      // console.log(`Token: ${token}`);
+  
+      setAppState({
+        user: user.email,
+        userData: { email, username },
+        token: token,
+      });
+  
+      const createdUser = await createUser(email, username);
+      if (!createdUser) {
+        console.error("User creation failed");
+        return;
+      }
+  
+      navigate("/home");
+    } catch (error) {
+      console.error("Error during registration:", error);
     }
   };
 
