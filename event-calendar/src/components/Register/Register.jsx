@@ -10,8 +10,8 @@ const Register = () => {
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
   const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState(""); 
-  const [ phoneNumber, setPhoneNumber] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
   const [password, setPassword] = useState("");
 
   const { setAppState } = useContext(AppContext);
@@ -32,7 +32,13 @@ const Register = () => {
         token: token,
       });
 
-      const createdUser = await createUser(email, username, firstName, lastName, phoneNumber);
+      const createdUser = await createUser(
+        email,
+        username,
+        firstName,
+        lastName,
+        phoneNumber
+      );
       if (!createdUser) {
         console.error("User creation failed");
         return;
@@ -46,7 +52,10 @@ const Register = () => {
   };
 
   return (
-    <form onSubmit={handleRegister}>
+    <form
+      className="flex flex-col p2 w-30 h-50 item-"
+      onSubmit={handleRegister}
+    >
       <input
         type="email"
         value={email}
@@ -65,7 +74,7 @@ const Register = () => {
         onChange={(e) => setFirstName(e.target.value)}
         placeholder="FirstName"
       />
-       <input
+      <input
         type="lastName"
         value={lastName}
         onChange={(e) => setLastName(e.target.value)}
