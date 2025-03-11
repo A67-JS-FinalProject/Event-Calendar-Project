@@ -40,7 +40,7 @@ const Login = () => {
         token: user,
       });
 
-      navigate("/"); // Redirect to home page
+      navigate("/home"); // Redirect to home page
     };
 
     handleLogin();
