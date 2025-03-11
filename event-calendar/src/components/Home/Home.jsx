@@ -1,5 +1,7 @@
 import { useState } from "react";
 import React from "react";
+import { FaChevronLeft } from "react-icons/fa";
+import { FaChevronRight } from "react-icons/fa";
 
 const Home = () => {
   const [view, setView] = useState("year");
@@ -43,15 +45,9 @@ const Home = () => {
     return (
       <div className="p-4 bg-base-100 rounded-lg shadow-md">
         <div className="flex justify-between items-center mb-4">
-          <button className="btn btn-primary" onClick={() => changeYear(-1)}>
-            Prev Year
-          </button>
           <span className="text-xl font-bold text-primary">
             {selectedDate.getFullYear()}
           </span>
-          <button className="btn btn-primary" onClick={() => changeYear(1)}>
-            Next Year
-          </button>
         </div>
         <div className="grid grid-cols-3 gap-4">
           {Array.from({ length: 12 }, (_, i) => (
@@ -92,18 +88,12 @@ const Home = () => {
     return (
       <div className="p-4 bg-base-100 rounded-lg shadow-md">
         <div className="flex justify-between items-center mb-4">
-          <button className="btn btn-primary" onClick={() => changeMonth(-1)}>
-            Prev Month
-          </button>
           <span className="text-xl font-bold text-primary">
             {selectedDate.toLocaleString("default", {
               month: "long",
               year: "numeric",
             })}
           </span>
-          <button className="btn btn-primary" onClick={() => changeMonth(1)}>
-            Next Month
-          </button>
         </div>
         <div className="grid grid-cols-7 text-center font-bold mb-2">
           {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((day) => (
@@ -137,15 +127,9 @@ const Home = () => {
     return (
       <div className="p-4 bg-base-100 rounded-lg shadow-md">
         <div className="flex justify-between items-center mb-4">
-          <button className="btn btn-primary" onClick={() => changeWeek(-1)}>
-            Prev Week
-          </button>
           <span className="text-xl font-bold text-primary">
             Week of {startOfWeek.toDateString()}
           </span>
-          <button className="btn btn-primary" onClick={() => changeWeek(1)}>
-            Next Week
-          </button>
         </div>
         <div className="grid grid-cols-8">
           <div></div>
@@ -173,18 +157,12 @@ const Home = () => {
     return (
       <div className="p-4 bg-base-100 rounded-lg shadow-md">
         <div className="flex justify-between items-center mb-4">
-          <button className="btn btn-primary" onClick={() => changeDay(-1)}>
-            Prev Day
-          </button>
           <span className="text-xl font-bold text-primary">
             {selectedDate.toDateString()}
           </span>
-          <button className="btn btn-primary" onClick={() => changeDay(1)}>
-            Next Day
-          </button>
         </div>
         {Array.from({ length: 24 }).map((_, i) => (
-          <div key={i} className="border text-blue-600 p-2">
+          <div key={i} className="border text-blue-600 p-2 ">
             {i}:00
           </div>
         ))}
@@ -193,62 +171,156 @@ const Home = () => {
   };
 
   return (
-    <div className="flex h-screen">
-      {/* Sidebar */}
-      <aside className="w-3/15 bg-gray-800 text-white p-4">
-        <h2 className="text-xl font-bold mb-4">Navigation</h2>
-        <ul className="space-y-2">
-          <li>
-            <button
-              className="w-full text-left p-2 bg-gray-700 rounded"
-              onClick={() => setView("month")}
-            >
-              Create A Event
-            </button>
-          </li>
-          <li>
-            <button
-              className="w-full text-left p-2 bg-gray-700 rounded"
-              onClick={() => setView("year")}
-            >
-              Year View
-            </button>
-          </li>
-          <li>
-            <button
-              className="w-full text-left p-2 bg-gray-700 rounded"
-              onClick={() => setView("month")}
-            >
-              Month View
-            </button>
-          </li>
-          <li>
-            <button
-              className="w-full text-left p-2 bg-gray-700 rounded"
-              onClick={() => setView("week")}
-            >
-              Week View
-            </button>
-          </li>
-          <li>
-            <button
-              className="w-full text-left p-2 bg-gray-700 rounded"
-              onClick={() => setView("day")}
-            >
-              Day View
-            </button>
-          </li>
-        </ul>
-      </aside>
+    <>
+      <nav className="bg-gray-800 text-white p-4 flex flex-row items-center">
+        <h1 className="text-2xl font-bold">Event Calendar</h1>
+        <div className="">
+          {view === "day" && (
+            <>
+              <li className="text-decoration-none">
+                <button
+                  className="btn btn-primary"
+                  onClick={() => changeDay(-1)}
+                >
+                  <FaChevronLeft />
+                </button>
+              </li>
+              <li className="text-decoration-none">
+                <button
+                  className="btn btn-primary"
+                  onClick={() => changeDay(1)}
+                >
+                  <FaChevronRight />
+                </button>
+              </li>
+            </>
+          )}
+          {view === "week" && (
+            <>
+              <li className="text-decoration-none">
+                <button
+                  className="btn btn-primary"
+                  onClick={() => changeWeek(-1)}
+                >
+                  <FaChevronLeft />
+                </button>
+              </li>
+              <li className="text-decoration-none">
+                <button
+                  className="btn btn-primary"
+                  onClick={() => changeWeek(1)}
+                >
+                  <FaChevronRight />
+                </button>
+              </li>
+            </>
+          )}
+          {view === "month" && (
+            <>
+              <li className="text-decoration-none">
+                <button
+                  className="btn btn-primary"
+                  onClick={() => changeMonth(-1)}
+                >
+                  <FaChevronLeft />
+                </button>
+              </li>
+              <li className="text-decoration-none">
+                <button
+                  className="btn btn-primary"
+                  onClick={() => changeMonth(1)}
+                >
+                  <FaChevronRight />
+                </button>
+              </li>
+            </>
+          )}
+          {view === "year" && (
+            <>
+              <li className="text-decoration-none">
+                <button
+                  className="btn btn-primary"
+                  onClick={() => changeYear(-1)}
+                >
+                  <FaChevronLeft />
+                </button>
+              </li>
+              <li className="text-decoration-none">
+                <button
+                  className="btn btn-primary"
+                  onClick={() => changeYear(1)}
+                >
+                  <FaChevronRight />
+                </button>
+              </li>
+            </>
+          )}
+        </div>
+        <div>
+          <details className="dropdown">
+            <summary className="btn m-1">Select View</summary>
 
-      {/* Calendar */}
-      <div className="w-14/15 p-4 overflow-auto">
-        {view === "year" && renderYearView()}
-        {view === "month" && renderMonthView()}
-        {view === "week" && renderWeekView()}
-        {view === "day" && renderDayView()}
+            <ul className="menu dropdown-content bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm">
+              <li className="text-decoration-none">
+                <button
+                  className="w-full text-left p-2 hover:bg-gray-600"
+                  onClick={() => setView("day")}
+                >
+                  Day View
+                </button>
+              </li>
+              <li className="text-decoration-none">
+                <button
+                  className="w-full text-left p-2 hover:bg-gray-600"
+                  onClick={() => setView("week")}
+                >
+                  Week View
+                </button>
+              </li>
+              <li className="text-decoration-none">
+                <button
+                  className="w-full text-left p-2 hover:bg-gray-600"
+                  onClick={() => setView("month")}
+                >
+                  Month View
+                </button>
+              </li>
+              <li className="text-decoration-none">
+                <button
+                  className="w-full text-left p-2 hover:bg-gray-600"
+                  onClick={() => setView("year")}
+                >
+                  Year View
+                </button>
+              </li>
+            </ul>
+          </details>
+        </div>
+      </nav>
+      <div className="flex h-screen">
+        {/* Sidebar */}
+        <aside className="w-3/15 bg-gray-800 text-white p-4">
+          <ul className="space-y-2">
+            <li className="text-decoration-none">
+              <button
+                className="w-full text-left p-2 bg-gray-700 rounded"
+                onClick={() => setView("month")}
+              >
+                Create A Event
+              </button>
+            </li>
+          </ul>
+        </aside>
+
+        {/* Calendar */}
+        <div className="w-14/15 p-4 overflow-auto">
+          {view === "year" && renderYearView()}
+          {view === "month" && renderMonthView()}
+          {view === "week" && renderWeekView()}
+          {view === "day" && renderDayView()}
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 
