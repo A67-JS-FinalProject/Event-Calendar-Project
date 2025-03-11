@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import RenderEvent from "./components/RenderEvent/ViewEvent";
 import CreateAnEvent from "./components/CreateAEvent/CreateAnEvent";
 import Login from "./components/Login/Login";
+import NotFound from "./components/NotFound/NotFound.jsx";
 import Register from "./components/Register/Register";
 import Home from "./components/Home/Home.jsx";
 import LandingPage from "./components/Home/LandingPage.jsx";
@@ -25,6 +26,7 @@ function App() {
           <Route path="/event/:id" element={<RenderEvent />} />
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </Router>
     </AppContext.Provider>
