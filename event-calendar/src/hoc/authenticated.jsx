@@ -1,12 +1,17 @@
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { AppContext } from "../store/app.context";
 import { Navigate, useLocation } from "react-router-dom";
 import PropTypes from "prop-types";
+
 export default function Authenticated({ children }) {
-  const { user } = useContext(AppContext);
+  const { appState } = useContext(AppContext);
   const location = useLocation();
 
-  if (!user) {
+  useEffect(() => {
+    console.log("Current appState:", appState);
+  }, [appState]);
+
+  if (!appState.user) {
     return <Navigate replace to="/" state={{ from: location }} />;
   }
 

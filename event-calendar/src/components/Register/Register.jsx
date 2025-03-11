@@ -1,3 +1,4 @@
+// filepath: d:\Final -project\Event-Calendar-Project\event-calendar\src\components\Register\Register.jsx
 import { useState, useContext } from "react";
 import { registerUser } from "../../services/authenticationService";
 import { createUser } from "../../services/usersService";
@@ -11,7 +12,7 @@ const Register = () => {
   const [password, setPassword] = useState("");
 
   const { setAppState } = useContext(AppContext);
-  
+
   const navigate = useNavigate();
 
   const handleRegister = async (e) => {
@@ -19,23 +20,23 @@ const Register = () => {
     try {
       const user = await registerUser(email, password);
       console.log(user);
-  
+
       const token = await getIdToken(user);
-      // console.log(`Token: ${token}`);
-  
+
       setAppState({
         user: user.email,
         userData: { email, username },
         token: token,
       });
-  
+
       const createdUser = await createUser(email, username);
       if (!createdUser) {
         console.error("User creation failed");
         return;
       }
-  
+
       navigate("/home");
+      console.log(`Token: ${user}`);
     } catch (error) {
       console.error("Error during registration:", error);
     }
