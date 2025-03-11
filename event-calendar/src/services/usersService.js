@@ -18,14 +18,14 @@ export const getUserByEmail = async (email, token) => {
   }
 };
 
-export const createUser = async (email, username) => {
+export const createUser = async (email, username, firstName, lastName, phoneNumber) => {
   try {
     const response = await fetch(`${URL}/users`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ email, username }),
+      body: JSON.stringify({ email, username, firstName, lastName, phoneNumber }),
     });
 
     const data = await response.json();
