@@ -9,6 +9,9 @@ import { getIdToken } from "firebase/auth";
 const Register = () => {
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState(""); 
+  const [ phoneNumber, setPhoneNumber] = useState("");
   const [password, setPassword] = useState("");
 
   const { setAppState } = useContext(AppContext);
@@ -29,7 +32,7 @@ const Register = () => {
         token: token,
       });
 
-      const createdUser = await createUser(email, username);
+      const createdUser = await createUser(email, username, firstName, lastName, phoneNumber);
       if (!createdUser) {
         console.error("User creation failed");
         return;
@@ -55,6 +58,24 @@ const Register = () => {
         value={username}
         onChange={(e) => setUsername(e.target.value)}
         placeholder="Username"
+      />
+      <input
+        type="firstName"
+        value={firstName}
+        onChange={(e) => setFirstName(e.target.value)}
+        placeholder="FirstName"
+      />
+       <input
+        type="lastName"
+        value={lastName}
+        onChange={(e) => setLastName(e.target.value)}
+        placeholder="LastName"
+      />
+      <input
+        type="phoneNumber"
+        value={phoneNumber}
+        onChange={(e) => setPhoneNumber(e.target.value)}
+        placeholder="PhoneNumber"
       />
       <input
         type="password"
