@@ -40,9 +40,10 @@ const Home = () => {
     );
   };
   const actions = {
-    week: changeWeek,
-    month: changeMonth,
-    year: changeYear,
+    Day: changeDay,
+    Week: changeWeek,
+    Month: changeMonth,
+    Year: changeYear,
   };
 
   const handleDateClick = (day) => {
@@ -194,26 +195,6 @@ const Home = () => {
           </a>
           <h1 className="text-2xl font-bold">Event Calendar</h1>
           <div className="">
-            {view === "Day" && (
-              <>
-                <li className="text-decoration-none">
-                  <button
-                    className="btn btn-primary"
-                    onClick={() => changeDay(-1)}
-                  >
-                    <FaChevronLeft />
-                  </button>
-                </li>
-                <li className="text-decoration-none">
-                  <button
-                    className="btn btn-primary"
-                    onClick={() => changeDay(1)}
-                  >
-                    <FaChevronRight />
-                  </button>
-                </li>
-              </>
-            )}
 
             {actions[view] && (
               <div className="flex flex-row  items-center">
