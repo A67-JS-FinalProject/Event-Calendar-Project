@@ -10,6 +10,7 @@ import LandingPage from "./components/Home/LandingPage.jsx";
 import { AppContext } from "./store/app.context.js";
 import { useState } from "react";
 import Authenticated from "./hoc/authenticated.jsx";
+import Footer from "./components/Footer/Footer.jsx";
 function App() {
   const [appState, setAppState] = useState({
     user: null,
@@ -29,6 +30,7 @@ function App() {
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Router>
+      <Footer />
     </AppContext.Provider>
   );
 }
