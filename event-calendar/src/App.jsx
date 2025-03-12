@@ -6,6 +6,7 @@ import Login from "./components/Login/Login";
 import NotFound from "./components/NotFound/NotFound.jsx";
 import Register from "./components/Register/Register";
 import Home from "./components/Home/Home.jsx";
+import Profile from "./components/Profile/Profile.jsx";
 import LandingPage from "./components/Home/LandingPage.jsx";
 import { AppContext } from "./store/app.context.js";
 import { useState } from "react";
@@ -27,6 +28,7 @@ function App() {
           <Route path="/event/:id" element={<RenderEvent />} />
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/home/profile" element={<Profile />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Router>
