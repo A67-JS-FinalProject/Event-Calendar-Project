@@ -1,20 +1,28 @@
 import { useEffect, useState } from "react";
 import React from "react";
+import { useNavigate } from "react-router-dom";
+
 import { FaChevronLeft } from "react-icons/fa";
 import { FaChevronRight } from "react-icons/fa";
 import { RxHamburgerMenu } from "react-icons/rx";
 import { GoTriangleDown } from "react-icons/go";
-import { MdAccountCircle } from "react-icons/md";
+import { FaRegCalendarAlt } from "react-icons/fa";
+import { LuListTodo } from "react-icons/lu";
+import { FaPlus } from "react-icons/fa";
+
+import logo from "../../assets/logo.png";
 
 const Home = () => {
+  const navigate = useNavigate();
   const [view, setView] = useState("Year");
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [isOpen, setIsOpen] = useState(true);
 
+  // Fix the document title
   useEffect(() => {
     document.title = "Event Calendar";
     fetch("/api/events");
-  });
+  }, []); // Empty dependency array ensures this runs only once
 
   const changeMonth = (offset) => {
     setSelectedDate(
@@ -39,6 +47,7 @@ const Home = () => {
       new Date(selectedDate.setDate(selectedDate.getDate() + offset))
     );
   };
+
   const actions = {
     Day: changeDay,
     Week: changeWeek,
@@ -57,29 +66,84 @@ const Home = () => {
   };
 
   const renderYearView = () => {
+    const months = Array.from({ length: 12 }, (_, i) => i);
+
     return (
-      <div className="p-4 bg-base-100 rounded-lg shadow-md">
-        <div className="flex justify-between items-center mb-4">
-          <span className="text-xl font-bold text-primary">
-            {selectedDate.getFullYear()}
-          </span>
-        </div>
-        <div className="grid grid-cols-3 gap-4">
-          {Array.from({ length: 12 }, (_, i) => (
-            <div
-              key={i}
-              className="border p-4 rounded-lg cursor-pointer hover:bg-gray-200 text-center text-lg font-semibold"
-              onClick={() => {
-                setSelectedDate(new Date(selectedDate.getFullYear(), i, 1));
-                setView("Month");
-              }}
-            >
-              {new Date(selectedDate.getFullYear(), i, 1).toLocaleString(
-                "default",
-                { month: "long" }
-              )}
-            </div>
-          ))}
+      <div className=" m-0 bg-red-100 rounded-[3rem] w-98/100 h-  pb-40 pt-7 pr-0 shadow-md">
+        <div className="grid grid-cols-4 gap-2.5">
+          {months.map((month) => {
+            const daysInMonth = new Date(
+              selectedDate.getFullYear(),
+              month + 1,
+              0
+            ).getDate();
+            const firstDay = new Date(
+              selectedDate.getFullYear(),
+              month,
+              1
+            ).getDay();
+
+            const adjustedFirstDay = firstDay === 0 ? 6 : firstDay - 1;
+            const prevMonthDays = adjustedFirstDay;
+            const prevMonthLastDay = new Date(
+              selectedDate.getFullYear(),
+              month,
+              0
+            ).getDate();
+            const prevMonthDates = Array.from(
+              { length: prevMonthDays },
+              (_, i) => prevMonthLastDay - prevMonthDays + i + 1
+            );
+
+            const nextMonthDays = 42 - (prevMonthDays + daysInMonth);
+            const nextMonthDates = Array.from(
+              { length: nextMonthDays },
+              (_, i) => i + 1
+            );
+
+            const allDates = [
+              ...prevMonthDates.map((day) => ({ day, isCurrentMonth: false })),
+              ...Array.from({ length: daysInMonth }, (_, i) => ({
+                day: i + 1,
+                isCurrentMonth: true,
+              })),
+              ...nextMonthDates.map((day) => ({ day, isCurrentMonth: false })),
+            ];
+
+            return (
+              <div
+                key={month}
+                className="flex flex-col rounded-md w-4xs h-4xs px-8 justify-center"
+              >
+                <div className="text-start font-bold text-base mb-1">
+                  {new Date(
+                    selectedDate.getFullYear(),
+                    month,
+                    1
+                  ).toLocaleString("default", { month: "short" })}
+                </div>
+                <div className="grid grid-cols-7 gap-1.5">
+                  {["M", "T", "W", "T", "F", "S", "S"].map((day, index) => (
+                    <div
+                      key={`${day}-${index}`}
+                      className="text-[13px] text-black text-center"
+                    >
+                      {day}
+                    </div>
+                  ))}
+                  {allDates.map((date, i) => (
+                    <div
+                      key={i}
+                      onClick={() => handleDateClick(date.day)}
+                      className="text-center text-[13px] mx-1 cursor-pointer text-black hover:bg-gray-200 rounded-full w-7 h-7 flex items-center justify-center"
+                    >
+                      {date.day}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
     );
@@ -97,19 +161,46 @@ const Home = () => {
       1
     ).getDay();
 
-    // Adjust firstDay to make Monday the first day of the week
     const adjustedFirstDay = firstDay === 0 ? 6 : firstDay - 1;
 
+    const prevMonthDays = adjustedFirstDay;
+    const prevMonthLastDay = new Date(
+      selectedDate.getFullYear(),
+      selectedDate.getMonth(),
+      0
+    ).getDate();
+    const prevMonthDates = Array.from(
+      { length: prevMonthDays },
+      (_, i) => prevMonthLastDay - prevMonthDays + i + 1
+    );
+
+    const nextMonthDays = 42 - (prevMonthDays + daysInMonth);
+    const nextMonthDates = Array.from(
+      { length: nextMonthDays },
+      (_, i) => i + 1
+    );
+
+    const allDates = [
+      ...prevMonthDates.map((day) => ({
+        day,
+        isCurrentMonth: false,
+        isPrevMonth: true,
+      })),
+      ...Array.from({ length: daysInMonth }, (_, i) => ({
+        day: i + 1,
+        isCurrentMonth: true,
+        isPrevMonth: false,
+      })),
+      ...nextMonthDates.map((day) => ({
+        day,
+        isCurrentMonth: false,
+        isPrevMonth: false,
+      })),
+    ];
+
     return (
-      <div className="p-4 bg-base-100 rounded-lg shadow-md">
-        <div className="flex justify-between items-center mb-4">
-          <span className="text-xl font-bold text-primary">
-            {selectedDate.toLocaleString("default", {
-              month: "long",
-              year: "numeric",
-            })}
-          </span>
-        </div>
+      <div className="p-4 bg-base-100 rounded-lg shadow-md w-full h-full">
+        <div className="flex justify-between items-center mb-4"></div>
         <div className="grid grid-cols-7 text-center font-bold mb-2">
           {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((day) => (
             <div key={day} className="text-lg text-secondary">
@@ -117,17 +208,18 @@ const Home = () => {
             </div>
           ))}
         </div>
-        <div className="grid grid-cols-7 grid-rows-6 gap-2">
-          {Array.from({ length: adjustedFirstDay }).map((_, i) => (
-            <div key={i}></div>
-          ))}
-          {Array.from({ length: daysInMonth }, (_, i) => (
+        <div className="grid grid-cols-6 grid-rows-6 w-full h-full">
+          {allDates.map((date, i) => (
             <div
               key={i}
-              className="border p-4 text-center cursor-pointer hover:bg-blue-100 rounded-lg text-lg font-semibold"
-              onClick={() => handleDateClick(i + 1)}
+              className={`text-center cursor-pointer hover:bg-blue-100 border text-lg font-semibold ${
+                date.isCurrentMonth
+                  ? "text-black"
+                  : "text-gray-400 border-black"
+              }`}
+              onClick={() => date.isCurrentMonth && handleDateClick(date.day)}
             >
-              {i + 1}
+              {date.day}
             </div>
           ))}
         </div>
@@ -141,11 +233,6 @@ const Home = () => {
 
     return (
       <div className="p-4 bg-base-100 rounded-lg shadow-md">
-        <div className="flex justify-between items-center mb-4">
-          <span className="text-xl font-bold text-primary">
-            Week of {startOfWeek.toDateString()}
-          </span>
-        </div>
         <div className="grid grid-cols-8">
           <div></div>
           {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((day) => (
@@ -172,12 +259,10 @@ const Home = () => {
     return (
       <div className="p-4 bg-base-100 rounded-lg shadow-md">
         <div className="flex justify-between items-center mb-4">
-          <span className="text-xl font-bold text-primary">
-            {selectedDate.toDateString()}
-          </span>
+          <span className="text-xl font-bold text-primary"></span>
         </div>
         {Array.from({ length: 24 }).map((_, i) => (
-          <div key={i} className="border text-blue-600 p-2 ">
+          <div key={i} className="border text-blue-600 p-2">
             {i}:00
           </div>
         ))}
@@ -187,120 +272,141 @@ const Home = () => {
 
   return (
     <>
-      <nav className="bg-gray-800 text-white p-4 flex flex-row items-center ">
-        {/* Right part navbar */}
-        <div className="flex flex-row items-center basis-1/2">
-          <a className="btn btn-ghost  " onClick={() => setIsOpen(!isOpen)}>
+      <nav className="bg-gray-800 text-white p-4 flex items-center justify-between">
+        {/* Left: Hamburger + Logo + Navigation */}
+        <div className="flex items-center gap-4">
+          <button className="btn btn-ghost" onClick={() => setIsOpen(!isOpen)}>
             <RxHamburgerMenu className="text-3xl" />
-          </a>
-          <h1 className="text-2xl font-bold">Event Calendar</h1>
-          <div className="">
+          </button>
+          <img src={logo} alt="Logo" className="h-8" />
 
-            {actions[view] && (
-              <div className="flex flex-row  items-center">
-                {[-1, 1].map((dir) => (
-                  <li key={dir} className="list-none px-1">
-                    <button
-                      className="p-3 hover:bg-secondary hover:scale-105 transition duration-300 rounded-full text-decoration-none"
-                      onClick={() => actions[view](dir)}
-                    >
-                      {dir === -1 ? <FaChevronLeft /> : <FaChevronRight />}
-                    </button>
-                  </li>
-                ))}
-              </div>
-            )}
+          {actions[view] && (
+            <ul className="flex items-center gap-2">
+              {[-1, 1].map((dir) => (
+                <li key={dir}>
+                  <button
+                    className=" p-3 hover:bg-gray-600 hover:rounded-full hover:scale-105 transition duration-300"
+                    onClick={() => actions[view](dir)}
+                  >
+                    {dir === -1 ? <FaChevronLeft /> : <FaChevronRight />}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+          {/* Display Selected Date */}
+          <div className="text-lg font-semibold">
+            {view === "Year" &&
+              selectedDate.toLocaleDateString("default", {
+                year: "numeric",
+              })}
+            {view === "Month" &&
+              selectedDate.toLocaleDateString("default", {
+                year: "numeric",
+                month: "long",
+              })}
+            {view === "Week" &&
+              selectedDate.toLocaleDateString("default", {
+                month: "long",
+                year: "numeric",
+              })}
+            {view === "Day" &&
+              selectedDate.toLocaleDateString("default", {
+                month: "long",
+                day: "numeric",
+                year: "numeric",
+              })}
           </div>
         </div>
 
-        {/* Leftside navbar*/}
-        <div className="flex justify-end basis-1/2">
-          {/* Dropdown */}
-          <details className="dropdown rounded-full">
-            <summary className="btn rounded-full w-27 text-1/2 p-4">
-              {view} <GoTriangleDown />
+        {/* Right: Dropdowns & Icons */}
+        <div className="flex items-center gap-4">
+          {/* View Selection Dropdown */}
+          <details className="dropdown border-2 divide-x rounded-full p-1">
+            <summary className="btn btn-ghost rounded-full flex items-center">
+              {view} <GoTriangleDown className="ml-2" />
             </summary>
+            <ul className="menu m-3 dropdown-content bg-base-100 rounded-box shadow-lg z-10 w-52 p-2">
+              {["Day", "Week", "Month", "Year"].map((v) => (
+                <li key={v}>
+                  <button
+                    className="w-full text-left p-2 hover:bg-gray-600"
+                    onClick={() => setView(v)}
+                  >
+                    {v}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </details>
 
-            <ul className="menu dropdown-content bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm">
-              <li className="text-decoration-none">
-                <button
-                  className="w-full text-left p-2 hover:bg-gray-600"
-                  onClick={() => setView("Day")}
-                >
-                  Day View
+          {/* Calendar & To-Do Icons */}
+          <div className="flex items-center border-2 divide-x rounded-full px-4 py-2">
+            <div className="p-2">
+              <FaRegCalendarAlt className="mr-2" />
+            </div>
+            <div className="p-2">
+              <LuListTodo className="ml-2" />
+            </div>
+          </div>
+
+          {/* Profile Dropdown */}
+          <details className="dropdown">
+            <summary className="btn btn-ghost rounded-full">
+              <GoTriangleDown />
+            </summary>
+            <ul className="menu dropdown-content bg-base-100 rounded-box shadow-lg z-10 w-52 p-2">
+              <li>
+                <button onClick={() => navigate("/home/profile")}>
+                  Profile Details
                 </button>
               </li>
-              <li className="text-decoration-none">
-                <button
-                  className="w-full text-left p-2 hover:bg-gray-600"
-                  onClick={() => setView("Week")}
-                >
-                  Week View
-                </button>
-              </li>
-              <li className="text-decoration-none">
-                <button
-                  className="w-full text-left p-2 hover:bg-gray-600"
-                  onClick={() => setView("Month")}
-                >
-                  Month View
-                </button>
-              </li>
-              <li className="text-decoration-none">
-                <button
-                  className="w-full text-left p-2 hover:bg-gray-600"
-                  onClick={() => setView("Year")}
-                >
-                  Year View
+              <li>
+                <button onClick={() => navigate("/home/profile")}>
+                  My Events
                 </button>
               </li>
             </ul>
           </details>
-          <div>
-            <button className="btn"></button>
-          </div>
-          <div>
-            <MdAccountCircle />
-          </div>
         </div>
       </nav>
-      <div className="flex h-screen">
-        {/* Sidebar */}
 
-        <div
-          className={`bg-base-200 h-screen p-5 shadow-lg transition-all ${
-            isOpen ? "w-64" : "w-0"
-          }`}
-        >
-          {/* Menu Items */}
-          <ul className="menu space-y-2">
-            <li>
-              {isOpen ? (
+      {/* Main Layout */}
+      <div className="flex h-full bg-gray-800 p-0">
+        {/* Sidebar */}
+        <div className="flex h-full bg-gray-800 p-0">
+          {/* Sidebar */}
+          <div
+            className={`bg-gray-800 h-screen shadow-lg transition-all duration-300 ease-in-out p-0 ${
+              isOpen ? "w-72" : "w-20 overflow-hidden"
+            }`}
+          >
+            <ul className="menu p-4">
+              <li>
                 <button
-                  className="w-full text-left p-2 bg-gray-700 rounded"
+                  className={`w-full text-left p-2 bg-gray-700 rounded-2xl transition-all transform duration-200 ease-in-out ${
+                    isOpen ? "scale-100" : "scale-90"
+                  }`}
                   onClick={() => setView("Month")}
                 >
-                  Create A Event
+                  <div
+                    className={`flex items-center ${
+                      isOpen ? "opacity-100" : "opacity-100"
+                    } transition-opacity duration-300 ease-in-out`}
+                  >
+                    <FaPlus className="text-2xl m-2" />
+                    {isOpen && (
+                      <p className="text-lg font-medium pr-3">Create</p>
+                    )}
+                  </div>
                 </button>
-              ) : (
-                "kurrr"
-              )}
-            </li>
-            <li>
-              <a className="flex items-center gap-3 hover:bg-base-300 p-2 rounded-lg">
-                {isOpen && <span>Settings</span>}
-              </a>
-            </li>
-            <li>
-              <a className="flex items-center gap-3 hover:bg-red-500 text-red-500 hover:text-white p-2 rounded-lg">
-                {isOpen && <span>Logout</span>}
-              </a>
-            </li>
-          </ul>
+              </li>
+            </ul>
+          </div>
         </div>
 
-        {/* Calendar */}
-        <div className="w-14/15 p-4 overflow-auto">
+        {/* Calendar Content */}
+        <div className="flex-1 p-0 pt-1 bg-gray-800  w-98/100 h-full  overflow-auto">
           {view === "Year" && renderYearView()}
           {view === "Month" && renderMonthView()}
           {view === "Week" && renderWeekView()}
