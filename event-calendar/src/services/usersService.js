@@ -36,14 +36,14 @@ export const createUser = async (email, username, firstName, lastName, phoneNumb
 }
 
 // ths function has to be viewed
-export const updateUserProfile = async (email, user) => {
+export const updateUserProfile = async (email, userData) => {
   try {
     const response = await fetch(`${URL}/users/${email}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(user),
+      body: JSON.stringify(userData),
     });
     const data = await response.json();
     return data;

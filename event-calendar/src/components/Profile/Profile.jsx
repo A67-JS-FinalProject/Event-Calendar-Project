@@ -64,7 +64,6 @@ function Details() {
             setError("Phone number must be 10 characters.");
             return;
         }
-        
 
         try {
             await updateUserProfile(user.email, {
@@ -87,17 +86,22 @@ function Details() {
         );
 
     return (
-        <div className="max-w-md mx-auto mt-8 p-6 border border-gray-300 rounded-lg shadow-lg bg-white">
-            <h2 className="text-2xl font-bold mb-6">Profile Details</h2>
+        <div className="max-w-md mx-auto mt-8 p-6 border border-gray-300 rounded-lg shadow-lg bg-white mb-8">
+            <h2 className="text-2xl font-bold mb-6 text-center">Profile Details</h2>
             <form onSubmit={handleSubmit}>
-                <div className="flex justify-center border-b border-gray-300 pb-4 mb-4">
-                    <div className="w-24 h-24 rounded-full overflow-hidden border-1 border-black shadow-md">
+                <div className="flex flex-col items-center border-b border-gray-300 pb-4 mb-4">
+                    <div className="w-30 h-30 rounded-full overflow-hidden border-1 border-black shadow-md mb-4">
                         <img
                             src={profilePictureURL}
                             alt="User Avatar"
                             className="w-full h-full object-cover"
                         />
                     </div>
+                    <fieldset className="fieldset mb-2">
+                        <legend className="fieldset-legend">Change Photo</legend>
+                        <input type="file" className="file-input" />
+                        <label className="fieldset-label">Max size 2MB</label>
+                    </fieldset>
                 </div>
                 <div className="mb-4">
                     <label className="block text-sm font-medium">Username (Cannot be changed)</label>
