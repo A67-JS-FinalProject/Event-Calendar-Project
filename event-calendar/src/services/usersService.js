@@ -10,7 +10,7 @@ export const getUserByEmail = async (email, token) => {
       },
     });
 
-    const allUsers = await response.json(); // Parse the response to JSON
+    const allUsers = await response.json();
     const user = allUsers.find((user) => user.email === email);
     return user;
   } catch (error) {
@@ -28,6 +28,23 @@ export const createUser = async (email, username, firstName, lastName, phoneNumb
       body: JSON.stringify({ email, username, firstName, lastName, phoneNumber }),
     });
 
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error fetching data:", error);
+  }
+}
+
+// ths function has to be viewed
+export const updateUserProfile = async (email, user) => {
+  try {
+    const response = await fetch(`${URL}/users/${email}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(user),
+    });
     const data = await response.json();
     return data;
   } catch (error) {

@@ -1,87 +1,151 @@
-import { useState } from "react";
-const Profile = () => {
+import { useState, useEffect } from "react";
+import { getUserByEmail, updateUserProfile } from "../../services/usersService";
+import { auth } from "../../config/firebaseConfig";
 
-    const [user, setUser] = useState({
-        firstName: "Martin",
-        lastName: "Mesechkov",
-        username: "martinmesechkov",
-        email: "test01@gmail.com",
-        phone: "0886957334",
-        profilePictureURL: "https://res.cloudinary.com/dglknhf3r/image/upload/v1741793969/default-profile-account-unknown-icon-black-silhouette-free-vector_nluuwb.jpg",
-    });
+function Details() {
+    const [user, setUser] = useState(null);
+    const [firstName, setFirstName] = useState("");
+    const [lastName, setLastName] = useState("");
+    const [phoneNumber, setPhoneNumber] = useState("");
+    const [profilePictureURL, setProfilePictureURL] = useState("");
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState("");
+    const [success, setSuccess] = useState("");
 
-    const handleChange = (e) => {
-        setUser({ ...user, [e.target.name]: e.target.value });
+    useEffect(() => {
+        const unsubscribe = auth.onAuthStateChanged(async (authUser) => {
+            if (authUser) {
+                console.log("Authenticated user found:", authUser);
+                try {
+                    console.log("Fetching user data...");
+                    const token = await authUser.getIdToken();
+                    const userData = await getUserByEmail(authUser.email, token);
+
+                    if (userData) {
+                        console.log("User data fetched:", userData);
+                        setUser(userData);
+                        setFirstName(userData.firstName || "");
+                        setLastName(userData.lastName || "");
+                        setPhoneNumber(userData.phoneNumber || "");
+                        setProfilePictureURL(userData.profilePictureURL || "");
+                    } else {
+                        console.log("User data not found");
+                        setError("User data not found");
+                    }
+                } catch (error) {
+                    console.error("Error fetching user data:", error);
+                    setError(error.message);
+                }
+            } else {
+                console.log("No authenticated user found.");
+            }
+            setLoading(false);
+        });
+
+        return () => unsubscribe();
+    }, []);
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setError("");
+        setSuccess("");
+
+        if (!user) return;
+
+        if (firstName.length < 4 || firstName.length > 32) {
+            setError("First name must be between 4 and 32 characters.");
+            return;
+        }
+        if (lastName.length < 4 || lastName.length > 32) {
+            setError("Last name must be between 4 and 32 characters.");
+            return;
+        }
+        if (phoneNumber.length < 10 || phoneNumber.length > 10) {
+            setError("Phone number must be 10 characters.");
+            return;
+        }
+        
+
+        try {
+            await updateUserProfile(user.email, {
+                firstName,
+                lastName,
+                phoneNumber,
+                profilePictureURL,
+            });
+            setSuccess("Profile updated successfully!");
+        } catch (error) {
+            setError(error.message);
+        }
     };
 
+    if (loading)
+        return (
+            <div className="flex justify-center items-center h-screen">
+                <span className="loading loading-spinner loading-xl"></span>
+            </div>
+        );
+
     return (
-        <div className="max-w-md mx-auto bg-white shadow-lg rounded-lg p-6">
-            <h2 className="text-2xl font-semibold mb-4">User Profile</h2>
-
-            <div className="avatar flex justify-center">
-                <div className="w-24 rounded-full border-1 border-black">
-                    <img className="item-center" src={user.profilePictureURL} />
+        <div className="max-w-md mx-auto mt-8 p-6 border border-gray-300 rounded-lg shadow-lg bg-white">
+            <h2 className="text-2xl font-bold mb-6">Profile Details</h2>
+            <form onSubmit={handleSubmit}>
+                <div className="flex justify-center border-b border-gray-300 pb-4 mb-4">
+                    <div className="w-24 h-24 rounded-full overflow-hidden border-1 border-black shadow-md">
+                        <img
+                            src={profilePictureURL}
+                            alt="User Avatar"
+                            className="w-full h-full object-cover"
+                        />
+                    </div>
                 </div>
-            </div>
-
-            <label className="block text-sm font-medium text-gray-700">First Name</label>
-            <input
-                type="text"
-                name="name"
-                value={user.firstName}
-                onChange={handleChange}
-                className="w-full p-2 border rounded-md focus:ring focus:ring-blue-300"
-                placeholder="Enter name"
-            />
-
-            <label className="block text-sm font-medium text-gray-700">Last Name</label>
-            <input
-                type="text"
-                name="name"
-                value={user.lastName}
-                onChange={handleChange}
-                className="w-full p-2 border rounded-md focus:ring focus:ring-blue-300"
-                placeholder="Enter name"
-            />
-
-             <label className="block text-sm font-medium text-gray-700">Username</label>
-            <input
-                type="text"
-                name="name"
-                value={user.username}
-                onChange={handleChange}
-                className="w-full p-2 border rounded-md focus:ring focus:ring-blue-300"
-                placeholder="Enter name"
-            />
-
-            <label className="block text-sm font-medium text-gray-700 mt-3">Email</label>
-            <input
-                type="email"
-                name="email"
-                value={user.email}
-                onChange={handleChange}
-                className="w-full p-2 border rounded-md focus:ring focus:ring-blue-300"
-                placeholder="Enter email"
-            />
-
-            <label className="block text-sm font-medium text-gray-700 mt-3">Phone</label>
-            <input
-                type="text"
-                name="phone"
-                value={user.phone}
-                onChange={handleChange}
-                className="w-full p-2 border rounded-md focus:ring focus:ring-blue-300"
-                placeholder="Enter phone"
-            />
-
-            <div className="flex justify-end mt-4">
-                <button className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">
-                    Save
+                <div className="mb-4">
+                    <label className="block text-sm font-medium">Username (Cannot be changed)</label>
+                    <input className="input input-bordered w-full" value={user?.username || ""} disabled />
+                </div>
+                <div className="mb-4">
+                    <label className="block text-sm font-medium">Email (Cannot be changed)</label>
+                    <input className="input input-bordered w-full" value={user?.email || ""} disabled />
+                </div>
+                <div className="mb-4">
+                    <label className="block text-sm font-medium">First Name</label>
+                    <input
+                        type="text"
+                        className="input input-bordered w-full"
+                        value={firstName}
+                        onChange={(e) => setFirstName(e.target.value)}
+                        placeholder="Enter your first name"
+                    />
+                </div>
+                <div className="mb-4">
+                    <label className="block text-sm font-medium">Last Name</label>
+                    <input
+                        type="text"
+                        className="input input-bordered w-full"
+                        value={lastName}
+                        onChange={(e) => setLastName(e.target.value)}
+                        placeholder="Enter your last name"
+                    />
+                </div>
+                <div className="mb-4">
+                    <label className="block text-sm font-medium">Phone Number</label>
+                    <input
+                        type="text"
+                        className="input input-bordered w-full"
+                        value={phoneNumber}
+                        onChange={(e) => setPhoneNumber(e.target.value)}
+                        placeholder="Enter your phone number"
+                    />
+                </div>
+                {error && <p className="text-red-500 mb-4">{error}</p>}
+                {success && <p className="text-green-500 mb-4">{success}</p>}
+                <button type="submit" className="btn btn-primary w-full">
+                    Update Profile
                 </button>
-            </div>
+            </form>
         </div>
     );
 }
 
-export default Profile;
+export default Details;
 
