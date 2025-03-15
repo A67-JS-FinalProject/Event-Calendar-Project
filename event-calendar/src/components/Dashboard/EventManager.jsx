@@ -1,6 +1,6 @@
 import { useState, useEffect, useContext } from 'react';
 import { AppContext } from '../../store/app.context';
-import { getUserEvents, getUpcomingEvents } from '../../services/eventService';
+import { getEventsByDateRange } from '../../services/eventService';
 import { Link } from 'react-router-dom';
 
 const EventManager = () => {
@@ -13,19 +13,12 @@ const EventManager = () => {
     const fetchEvents = async () => {
       setLoading(true);
       try {
-        if (filter === 'upcoming') {
-          const upcomingEvents = await getUpcomingEvents(
-            appState.user?.uid,
-            appState.token
-          );
-          setEvents(upcomingEvents || []);
-        } else {
-          const userEvents = await getUserEvents(
-            appState.user?.uid,
-            appState.token
-          );
-          setEvents(userEvents || []);
-        }
+        const upcomingEvents = await getEventsByDateRange(
+          new Date().toISOString(),
+          new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString(),
+          appState.token
+        );
+        setEvents(Array.isArray(upcomingEvents) ? upcomingEvents : []);
       } catch (error) {
         console.error('Error fetching events:', error);
         setEvents([]);

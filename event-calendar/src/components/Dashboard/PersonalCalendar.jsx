@@ -18,7 +18,7 @@ const PersonalCalendar = () => {
           lastDay.toISOString(),
           appState.token
         );
-        setEvents(monthEvents || []);
+        setEvents(Array.isArray(monthEvents) ? monthEvents : []);
       } catch (error) {
         console.error('Error fetching events:', error);
         setEvents([]);

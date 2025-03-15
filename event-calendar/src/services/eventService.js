@@ -99,19 +99,24 @@ export const getUpcomingEvents = async (userId, token) => {
 
 export const getEventsByDateRange = async (startDate, endDate, token) => {
   try {
-    const response = await fetch(
-      `${URL}/events/range?start=${startDate}&end=${endDate}`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-    const data = await response.json();
-    return data;
+    const response = await fetch(`${URL}/events`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      params: { startDate, endDate },
+    });
+    if (response.ok) {
+      const data = await response.json();
+      return data;
+    } else {
+      console.error('Error fetching events:', response.statusText);
+      return [];
+    }
   } catch (error) {
-    console.error("Error fetching events by date range:", error);
-    throw error;
+    console.error('Error fetching events:', error);
+    return [];
   }
 };
 
