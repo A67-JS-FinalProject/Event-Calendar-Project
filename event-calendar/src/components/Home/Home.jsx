@@ -9,6 +9,7 @@ import { GoTriangleDown } from "react-icons/go";
 import { FaRegCalendarAlt } from "react-icons/fa";
 import { LuListTodo } from "react-icons/lu";
 import { FaPlus } from "react-icons/fa";
+import CreateAnEvent from "../CreateAEvent/CreateAnEvent";
 
 import logo from "../../assets/logo.png";
 
@@ -17,12 +18,14 @@ const Home = () => {
   const [view, setView] = useState("Year");
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [isOpen, setIsOpen] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // Fix the document title
+  const openModal = () => setIsModalOpen(true);
+  const closeModal = () => setIsModalOpen(false);
   useEffect(() => {
     document.title = "Event Calendar";
     fetch("/api/events");
-  }, []); // Empty dependency array ensures this runs only once
+  }, []);
 
   const changeMonth = (offset) => {
     setSelectedDate(
@@ -353,10 +356,14 @@ const Home = () => {
           {/* Profile Dropdown */}
           <details className="dropdown">
             <summary className="btn btn-ghost rounded-full">
-              <GoTriangleDown />
+              <img src=" " alt="" /> <GoTriangleDown />
             </summary>
             <ul className="menu dropdown-content bg-base-100 rounded-box shadow-lg z-10 w-52 p-2">
-              <li>
+            <li>
+                <button onClick={() => navigate("/dashboard")}>
+                  Profile
+                </button>
+              </li>        <li>
                 <button onClick={() => navigate("/home/profile")}>
                   Profile Details
                 </button>
@@ -373,6 +380,7 @@ const Home = () => {
 
       {/* Main Layout */}
       <div className="flex h-full bg-gray-800 p-0">
+        <CreateAnEvent isOpen={isModalOpen} onRequestClose={closeModal} />
         {/* Sidebar */}
         <div className="flex h-full bg-gray-800 p-0">
           {/* Sidebar */}
@@ -394,9 +402,14 @@ const Home = () => {
                       isOpen ? "opacity-100" : "opacity-100"
                     } transition-opacity duration-300 ease-in-out`}
                   >
-                    <FaPlus className="text-2xl m-2" />
                     {isOpen && (
-                      <p className="text-lg font-medium pr-3">Create</p>
+                      <button
+                        onClick={openModal}
+                        className="text-lg font-medium flex flex-row  items-center pr-3"
+                      >
+                        <FaPlus className="text-2xl m-2" />
+                        Create
+                      </button>
                     )}
                   </div>
                 </button>
