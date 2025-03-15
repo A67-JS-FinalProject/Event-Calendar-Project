@@ -201,18 +201,18 @@ const Home = () => {
     return (
       <div className="p-4 bg-base-100 rounded-lg shadow-md w-full h-full">
         <div className="flex justify-between items-center mb-4"></div>
-        <div className="grid grid-cols-7 text-center font-bold mb-2">
+        <div className="grid grid-cols-7 text-center font-bold ">
           {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((day) => (
-            <div key={day} className="text-lg text-secondary">
+            <div key={day} className="text-lg  border">
               {day}
             </div>
           ))}
         </div>
-        <div className="grid grid-cols-6 grid-rows-6 w-full h-full">
+        <div className="grid grid-cols-7 grid-rows-7 w-full h-full">
           {allDates.map((date, i) => (
             <div
               key={i}
-              className={`text-center cursor-pointer hover:bg-blue-100 border text-lg font-semibold ${
+              className={`text-center cursor-pointer h-30  hover:bg-blue-100 border text-lg font-semibold ${
                 date.isCurrentMonth
                   ? "text-black"
                   : "text-gray-400 border-black"
