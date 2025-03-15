@@ -2,12 +2,17 @@ import { useState, useEffect, useContext } from 'react';
 import { AppContext } from '../../store/app.context';
 import { getEventsByDateRange } from '../../services/eventService';
 import { Link } from 'react-router-dom';
+import CreateAnEvent from '../CreateAEvent/CreateAnEvent';
 
 const EventManager = () => {
   const { appState } = useContext(AppContext);
   const [events, setEvents] = useState([]);
   const [filter, setFilter] = useState('upcoming');
   const [loading, setLoading] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const openModal = () => setIsModalOpen(true);
+  const closeModal = () => setIsModalOpen(false);
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -47,15 +52,18 @@ const EventManager = () => {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow p-6">
+    <div className="bg-white rounded-lg shadow p-6 relative">
+      <div className="fixed inset-0 flex items-center justify-center z-50 w-50 h-20">
+        <CreateAnEvent isOpen={isModalOpen} onRequestClose={closeModal} />
+      </div>
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-xl font-semibold">My Events</h2>
-        <Link
-          to="/create-an-event"
+        <button
+          onClick={openModal}
           className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
         >
           Create Event
-        </Link>
+        </button>
       </div>
 
       <div className="flex gap-2 mb-4">
