@@ -63,3 +63,72 @@ export const deleteEventsId = async (id) => {
     console.error("Error fetching data:", error);
   }
 };
+
+/**
+ * @Atanas Zaykov
+ */
+export const getUserEvents = async (userId, token) => {
+  try {
+    const response = await fetch(`${URL}/events/user/${userId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error fetching user events:", error);
+    throw error;
+  }
+};
+
+export const getUpcomingEvents = async (userId, token) => {
+  try {
+    const response = await fetch(`${URL}/events/upcoming/${userId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error fetching upcoming events:", error);
+    throw error;
+  }
+};
+
+export const getEventsByDateRange = async (startDate, endDate, token) => {
+  try {
+    const response = await fetch(
+      `${URL}/events/range?start=${startDate}&end=${endDate}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error fetching events by date range:", error);
+    throw error;
+  }
+};
+
+export const updateEventParticipants = async (eventId, participants, token) => {
+  try {
+    const response = await fetch(`${URL}/events/${eventId}/participants`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ participants }),
+    });
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error updating event participants:", error);
+    throw error;
+  }
+};
