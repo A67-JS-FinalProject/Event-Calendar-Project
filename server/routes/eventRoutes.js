@@ -20,6 +20,7 @@ EventRoutes.route("/events").post(async (request, response) => {
     coverPhoto,
     tags,
     reminders,
+    createdBy,
   } = request.body;
 
   const newEvent = {
@@ -34,12 +35,18 @@ EventRoutes.route("/events").post(async (request, response) => {
     coverPhoto,
     tags,
     reminders,
+    createdBy,
   };
 
   try {
     const result = await db.collection("events").insertOne(newEvent);
-    response.status(201).json(result.ops[0]);
+    if (result.insertedCount === 1) {
+      response.status(201).json(result.ops[0]);
+    } else {
+      throw new Error("Failed to create event");
+    }
   } catch (error) {
+    console.error("Error creating event:", error.message);
     response.status(500).json({ error: error.message });
   }
 });
