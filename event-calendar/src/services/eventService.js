@@ -99,13 +99,12 @@ export const getUpcomingEvents = async (userId, token) => {
 
 export const getEventsByDateRange = async (startDate, endDate, token) => {
   try {
-    const response = await fetch(`${URL}/events`, {
+    const response = await fetch(`${URL}/events?startDate=${startDate}&endDate=${endDate}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
       },
-      params: { startDate, endDate },
     });
     if (response.ok) {
       const data = await response.json();

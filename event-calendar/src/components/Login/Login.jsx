@@ -49,7 +49,7 @@ const Login = () => {
   return (
     <div className="flex justify-center items-center min-h-screen">
       <form
-        className="flex flex-col p-4 w-80 bg-white shadow-md rounded"
+        className="flex flex-col p-4 w-80 bg-black shadow-md rounded"
         onSubmit={handleSubmit}>
         <h2 className="text-2xl font-bold mb-4 text-center">Login</h2>
         <input
@@ -66,7 +66,7 @@ const Login = () => {
           placeholder="Password"
           className="mb-2 p-2 border rounded"
         />
-        <button type="submit" className="p-2 bg-blue-500 text-white rounded">Login</button>
+        <button type="submit" className="p-2 bg-blue-500 text-black rounded">Login</button>
       </form>
     </div>
   );

@@ -54,7 +54,7 @@ const Register = () => {
   return (
     <div className="flex justify-center items-center min-h-screen">
       <form
-        className="flex flex-col p-4 w-80 bg-white shadow-md rounded"
+        className="flex flex-col p-4 w-80 bg-black shadow-md rounded"
         onSubmit={handleRegister}
       >
       <h2 className="text-2xl font-bold mb-4 text-center">Register</h2>
@@ -100,7 +100,7 @@ const Register = () => {
           placeholder="Password"
           className="mb-2 p-2 border rounded"
         />
-        <button type="submit" className="p-2 bg-blue-500 text-white rounded">
+        <button type="submit" className="p-2 bg-blue-500 text-black rounded">
           Register
         </button>
       </form>
