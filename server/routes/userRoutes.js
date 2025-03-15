@@ -58,22 +58,31 @@ userRoutes.route("/users").post(async (req, res) => {
 });
 
 // Update User
-userRoutes.route("/users/:id").put(async (req, res) => {
+userRoutes.route("/users/:email").put(async (req, res) => {
   try {
     let db = connectObject.getDb();
     let updatedUser = {
       $set: {
-        email: req.body.email,
-        username: req.body.username,
+        firstName: req.body.firstName,
+        lastName: req.body.lastName,
+        phoneNumber: req.body.phoneNumber,
+        profilePictureURL: req.body.profilePictureURL,
       },
     };
-    let result = await db
-      .collection("users")
-      .updateOne({ _id: new ObjectId(req.params.id) }, updatedUser);
-    console.log("Updated user:", updatedUser); // Add logging
-    res.json(result);
+
+    let result = await db.collection("users").updateOne(
+      { email: req.params.email },
+      updatedUser
+    );
+
+    if (result.matchedCount === 0) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    console.log("Updated user:", updatedUser);
+    res.json({ message: "Profile updated successfully" });
   } catch (err) {
-    res.status(400).json("Error: " + err);
+    res.status(400).json({ error: err.message });
   }
 });
 
