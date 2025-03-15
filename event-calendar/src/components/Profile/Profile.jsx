@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { getUserByEmail, updateUserProfile } from "../../services/usersService";
 import { auth } from "../../config/firebaseConfig";
+import axios from "axios";
 
 function Details() {
     const [user, setUser] = useState(null);
@@ -11,6 +12,7 @@ function Details() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
+    const [uploading, setUploading] = useState(false);
 
     useEffect(() => {
         const unsubscribe = auth.onAuthStateChanged(async (authUser) => {
@@ -44,6 +46,41 @@ function Details() {
 
         return () => unsubscribe();
     }, []);
+
+    const handleFileChange = async (event) => {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        if (file.size > 2 * 1024 * 1024) {
+            setError("File size must be under 2MB");
+            return;
+        }
+
+        setUploading(true);
+        setError("");
+        setSuccess("");
+
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("upload_preset", "profile_pictures");
+        formData.append("cloud_name", "dglknhf3r");
+
+        try {
+            const response = await axios.post(
+                "https://api.cloudinary.com/v1_1/dglknhf3r/image/upload",
+                formData
+            );
+
+            const imageUrl = response.data.secure_url;
+            setProfilePictureURL(imageUrl);
+            setSuccess("Image uploaded successfully!");
+        } catch (error) {
+            console.error("Error uploading image:", error);
+            setError("Image upload failed.");
+        } finally {
+            setUploading(false);
+        }
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -99,9 +136,10 @@ function Details() {
                     </div>
                     <fieldset className="fieldset mb-2">
                         <legend className="fieldset-legend">Change Photo</legend>
-                        <input type="file" className="file-input" />
+                        <input type="file" className="file-input" onChange={handleFileChange}/>
                         <label className="fieldset-label">Max size 2MB</label>
                     </fieldset>
+                    {uploading && <p className="text-blue-500">Uploading...</p>}
                 </div>
                 <div className="mb-4">
                     <label className="block text-sm font-medium">Username (Cannot be changed)</label>

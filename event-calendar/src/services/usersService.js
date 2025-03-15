@@ -35,7 +35,6 @@ export const createUser = async (email, username, firstName, lastName, phoneNumb
   }
 }
 
-// ths function has to be viewed
 export const updateUserProfile = async (email, userData) => {
   try {
     const response = await fetch(`${URL}/users/${email}`, {
