@@ -359,7 +359,11 @@ const Home = () => {
               <img src=" " alt="" /> <GoTriangleDown />
             </summary>
             <ul className="menu dropdown-content bg-base-100 rounded-box shadow-lg z-10 w-52 p-2">
-              <li>
+            <li>
+                <button onClick={() => navigate("/dashboard")}>
+                  Profile
+                </button>
+              </li>        <li>
                 <button onClick={() => navigate("/home/profile")}>
                   Profile Details
                 </button>

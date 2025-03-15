@@ -12,6 +12,9 @@ import { AppContext } from "./store/app.context.js";
 import { useState } from "react";
 import Authenticated from "./hoc/authenticated.jsx";
 import Footer from "./components/Footer/Footer.jsx";
+import UserDashboard from './components/Dashboard/UserDashboard';
+
+
 function App() {
   const [appState, setAppState] = useState({
     user: null,
@@ -29,6 +32,7 @@ function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
           <Route path="/home/profile" element={<Profile />} />
+          <Route path="/dashboard" element={<Authenticated><UserDashboard /></Authenticated>} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Router>
