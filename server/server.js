@@ -7,6 +7,7 @@ import authRoutes from "./routes/authRoutes.js";
 import fs from "fs/promises";
 import path from "path";
 import userRoutes from "./routes/userRoutes.js";
+import { verifyAdmin } from "./middleware/adminMiddleware.js"; // Import admin middleware
 
 const PORT = process.env.PORT || 3000;
 const app = express();
@@ -14,7 +15,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(EventRoutes);
-app.use(userRoutes); // Ensure this line is present
+app.use(userRoutes); // Ensure is present
 
 const serviceAccountPath = path.resolve("firebase-admin-sdk.json");
 const serviceAccount = JSON.parse(

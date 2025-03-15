@@ -1,6 +1,8 @@
 import connect from "../connect.js";
 import express from "express";
 import { ObjectId } from "mongodb";
+import { verifyToken } from "../middleware/authMiddleware.js";
+import { verifyAdmin } from "../middleware/adminMiddleware.js"; // Import admin middleware
 
 const database = connect;
 const EventRoutes = express.Router();
@@ -144,6 +146,67 @@ EventRoutes.route("/events/:id").delete(async (request, response) => {
     }
   } catch (error) {
     response.status(500).json({ error: error.message });
+  }
+});
+
+// Admin-specific routes
+
+// Search events
+EventRoutes.route("/admin/events/search").get(verifyToken, verifyAdmin, async (req, res) => {
+  const db = database.getDb();
+  try {
+    const events = await db.collection("events").find(req.query).toArray();
+    res.status(200).json(events);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Edit event
+EventRoutes.route("/admin/events/:id").put(verifyToken, verifyAdmin, async (req, res) => {
+  const db = database.getDb();
+  const { title, startDate, endDate, location, description, participants, isPublic, isRecurring, coverPhoto, tags, reminders } = req.body;
+
+  const updatedEvent = {
+    $set: {
+      title,
+      startDate,
+      endDate,
+      location,
+      description,
+      participants,
+      isPublic,
+      isRecurring,
+      coverPhoto,
+      tags,
+      reminders,
+    },
+  };
+
+  try {
+    const result = await db.collection("events").updateOne({ _id: new ObjectId(req.params.id) }, updatedEvent);
+    if (result.modifiedCount > 0) {
+      res.status(200).json({ message: "Event updated successfully" });
+    } else {
+      res.status(404).json({ error: "Event not found" });
+    }
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Delete event
+EventRoutes.route("/admin/events/:id").delete(verifyToken, verifyAdmin, async (req, res) => {
+  const db = database.getDb();
+  try {
+    const result = await db.collection("events").deleteOne({ _id: new ObjectId(req.params.id) });
+    if (result.deletedCount > 0) {
+      res.status(200).json({ message: "Event deleted successfully" });
+    } else {
+      res.status(404).json({ error: "Event not found" });
+    }
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 });
 
