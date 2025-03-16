@@ -13,7 +13,7 @@ import { useState } from "react";
 import Authenticated from "./hoc/authenticated.jsx";
 import Footer from "./components/Footer/Footer.jsx";
 import UserDashboard from './components/Dashboard/UserDashboard';
-
+import AdminRoute from './hoc/adminRoute.jsx'; // Import AdminRoute
 
 function App() {
   const [appState, setAppState] = useState({
@@ -27,7 +27,7 @@ function App() {
         <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route path="/home" element={<Authenticated><Home /></Authenticated>} />
-          <Route path="/create-an-event" element={<CreateAnEvent />} />
+          <Route path="/create-an-event" element={<AdminRoute><CreateAnEvent /></AdminRoute>} />
           <Route path="/event/:id" element={<RenderEvent />} />
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
