@@ -2,6 +2,7 @@ import { useState, useContext, useEffect } from "react";
 import { createEvent } from "../../services/eventService";
 import { AppContext } from "../../store/app.context";
 import { getUserByEmail, updateUserEvent } from "../../services/usersService";
+import { useNavigate } from "react-router-dom";
 
 function CreateAnEvent({ isOpen, onRequestClose }) {
   const [title, setTitle] = useState("");
@@ -19,7 +20,7 @@ function CreateAnEvent({ isOpen, onRequestClose }) {
 
   const { appState, setAppState } = useContext(AppContext);
   const { user, token } = appState;
-
+  const navigate = useNavigate();
   useEffect(() => {
     const fetchUserData = async () => {
       if (user) {
@@ -71,6 +72,7 @@ function CreateAnEvent({ isOpen, onRequestClose }) {
       await updateUserEvent(userData.email, updatedEvents);
 
       onRequestClose();
+      navigate(`/events/${createdEvent._id}`);
     } catch (error) {
       console.error("Error during event creation:", error.message);
     }

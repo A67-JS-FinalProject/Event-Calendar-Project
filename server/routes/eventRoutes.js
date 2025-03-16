@@ -155,23 +155,27 @@ EventRoutes.route("/events/:id").delete(async (request, response) => {
 // Admin-specific routes
 
 // Search events
-EventRoutes.route("/admin/events/search").get(verifyToken, verifyAdmin, async (req, res) => {
-  const db = database.getDb();
-  try {
-    const events = await db.collection("events").find(req.query).toArray();
-    res.status(200).json(events);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
+EventRoutes.route("/admin/events/search").get(
+  verifyToken,
+  verifyAdmin,
+  async (req, res) => {
+    const db = database.getDb();
+    try {
+      const events = await db.collection("events").find(req.query).toArray();
+      res.status(200).json(events);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
   }
-});
+);
 
 // Edit event
-EventRoutes.route("/admin/events/:id").put(verifyToken, verifyAdmin, async (req, res) => {
-  const db = database.getDb();
-  const { title, startDate, endDate, location, description, participants, isPublic, isRecurring, coverPhoto, tags, reminders } = req.body;
-
-  const updatedEvent = {
-    $set: {
+EventRoutes.route("/admin/events/:id").put(
+  verifyToken,
+  verifyAdmin,
+  async (req, res) => {
+    const db = database.getDb();
+    const {
       title,
       startDate,
       endDate,
@@ -183,34 +187,58 @@ EventRoutes.route("/admin/events/:id").put(verifyToken, verifyAdmin, async (req,
       coverPhoto,
       tags,
       reminders,
-    },
-  };
+    } = req.body;
 
-  try {
-    const result = await db.collection("events").updateOne({ _id: new ObjectId(req.params.id) }, updatedEvent);
-    if (result.modifiedCount > 0) {
-      res.status(200).json({ message: "Event updated successfully" });
-    } else {
-      res.status(404).json({ error: "Event not found" });
+    const updatedEvent = {
+      $set: {
+        title,
+        startDate,
+        endDate,
+        location,
+        description,
+        participants,
+        isPublic,
+        isRecurring,
+        coverPhoto,
+        tags,
+        reminders,
+      },
+    };
+
+    try {
+      const result = await db
+        .collection("events")
+        .updateOne({ _id: new ObjectId(req.params.id) }, updatedEvent);
+      if (result.modifiedCount > 0) {
+        res.status(200).json({ message: "Event updated successfully" });
+      } else {
+        res.status(404).json({ error: "Event not found" });
+      }
+    } catch (error) {
+      res.status(500).json({ error: error.message });
     }
-  } catch (error) {
-    res.status(500).json({ error: error.message });
   }
-});
+);
 
 // Delete event
-EventRoutes.route("/admin/events/:id").delete(verifyToken, verifyAdmin, async (req, res) => {
-  const db = database.getDb();
-  try {
-    const result = await db.collection("events").deleteOne({ _id: new ObjectId(req.params.id) });
-    if (result.deletedCount > 0) {
-      res.status(200).json({ message: "Event deleted successfully" });
-    } else {
-      res.status(404).json({ error: "Event not found" });
+EventRoutes.route("/admin/events/:id").delete(
+  verifyToken,
+  verifyAdmin,
+  async (req, res) => {
+    const db = database.getDb();
+    try {
+      const result = await db
+        .collection("events")
+        .deleteOne({ _id: new ObjectId(req.params.id) });
+      if (result.deletedCount > 0) {
+        res.status(200).json({ message: "Event deleted successfully" });
+      } else {
+        res.status(404).json({ error: "Event not found" });
+      }
+    } catch (error) {
+      res.status(500).json({ error: error.message });
     }
-  } catch (error) {
-    res.status(500).json({ error: error.message });
   }
-});
+);
 
 export default EventRoutes;
