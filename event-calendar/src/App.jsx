@@ -29,7 +29,7 @@ function App() {
           <Route path="/events/:id" element={<RenderEvent />} />
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/home/profile" element={<Profile />} />
+          <Route path="/home/profile" element={<Authenticated><Profile /></Authenticated>} />
           <Route path="/dashboard" element={<Authenticated><UserDashboard /></Authenticated>} />
           <Route path="*" element={<NotFound />} />
         </Routes>
