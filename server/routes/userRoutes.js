@@ -47,7 +47,8 @@ userRoutes.route("/users").post(async (req, res) => {
       lastName: req.body.lastName,
       phoneNumber: req.body.phoneNumber,
       createdOn: new Date(),
-      profilePictureURL: "https://res.cloudinary.com/dglknhf3r/image/upload/v1741793969/default-profile-account-unknown-icon-black-silhouette-free-vector_nluuwb.jpg"
+      profilePictureURL:
+        "https://res.cloudinary.com/dglknhf3r/image/upload/v1741793969/default-profile-account-unknown-icon-black-silhouette-free-vector_nluuwb.jpg",
     };
     let result = await db.collection("users").insertOne(newUser);
     console.log("Inserted user:", newUser); // Add logging
@@ -63,17 +64,13 @@ userRoutes.route("/users/:email").put(async (req, res) => {
     let db = connectObject.getDb();
     let updatedUser = {
       $set: {
-        firstName: req.body.firstName,
-        lastName: req.body.lastName,
-        phoneNumber: req.body.phoneNumber,
-        profilePictureURL: req.body.profilePictureURL,
+        events: req.body.events,
       },
     };
 
-    let result = await db.collection("users").updateOne(
-      { email: req.params.email },
-      updatedUser
-    );
+    let result = await db
+      .collection("users")
+      .updateOne({ email: req.params.email }, updatedUser);
 
     if (result.matchedCount === 0) {
       return res.status(404).json({ message: "User not found" });
@@ -101,3 +98,40 @@ userRoutes.route("/users/:id").delete(async (req, res) => {
 });
 
 export default userRoutes;
+
+// upload the event id  to user
+userRoutes.route("/users/:email/events").put(async (req, res) => {
+  try {
+    let db = connectObject.getDb();
+    let user = await db
+      .collection("users")
+      .findOne({ email: req.params.email });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    let updatedEvents = user.events || [];
+    req.body.eventIds.forEach((id) => {
+      const objectId = new ObjectId(id);
+      if (!updatedEvents.some((eventId) => eventId.equals(objectId))) {
+        updatedEvents.push(objectId);
+      }
+    });
+
+    let updatedUser = {
+      $set: {
+        events: updatedEvents,
+      },
+    };
+
+    let result = await db
+      .collection("users")
+      .updateOne({ email: req.params.email }, updatedUser);
+
+    console.log("Updated user events:", updatedUser);
+    res.json({ message: "User events updated successfully" });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});

@@ -1,7 +1,7 @@
 import { useState, useContext, useEffect } from "react";
 import { createEvent } from "../../services/eventService";
 import { AppContext } from "../../store/app.context";
-import { getUserByEmail } from "../../services/usersService";
+import { getUserByEmail, updateUserEvent } from "../../services/usersService";
 
 function CreateAnEvent({ isOpen, onRequestClose }) {
   const [title, setTitle] = useState("");
@@ -56,27 +56,25 @@ function CreateAnEvent({ isOpen, onRequestClose }) {
           firstName: userData.firstName,
           lastName: userData.lastName,
         },
+        email: userData.email,
       };
       const createdEvent = await createEvent(event, token);
-
       if (!createdEvent) {
         console.error("Event creation failed");
         return;
       }
 
-      setAppState((prevState) => ({
-        ...prevState,
-        events: Array.isArray(prevState.events)
-          ? [...prevState.events, createdEvent]
-          : [createdEvent],
-      }));
+      const updatedEvents = Array.isArray(userData.events)
+        ? [...userData.events, createdEvent._id]
+        : [createdEvent._id];
+
+      await updateUserEvent(userData.email, updatedEvents);
 
       onRequestClose();
     } catch (error) {
       console.error("Error during event creation:", error.message);
     }
   };
-
   if (!isOpen) return null;
   return (
     <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center ">

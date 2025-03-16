@@ -359,11 +359,10 @@ const Home = () => {
               <img src=" " alt="" /> <GoTriangleDown />
             </summary>
             <ul className="menu dropdown-content bg-base-100 rounded-box shadow-lg z-10 w-52 p-2">
-            <li>
-                <button onClick={() => navigate("/dashboard")}>
-                  Profile
-                </button>
-              </li>        <li>
+              <li>
+                <button onClick={() => navigate("/dashboard")}>Profile</button>
+              </li>{" "}
+              <li>
                 <button onClick={() => navigate("/home/profile")}>
                   Profile Details
                 </button>
@@ -403,13 +402,13 @@ const Home = () => {
                     } transition-opacity duration-300 ease-in-out`}
                   >
                     {isOpen && (
-                      <button
+                      <div
                         onClick={openModal}
-                        className="text-lg font-medium flex flex-row  items-center pr-3"
+                        className="text-lg font-medium flex flex-row items-center pr-3 cursor-pointer"
                       >
                         <FaPlus className="text-2xl m-2" />
                         Create
-                      </button>
+                      </div>
                     )}
                   </div>
                 </button>

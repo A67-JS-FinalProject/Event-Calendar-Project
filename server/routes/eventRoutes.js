@@ -21,6 +21,7 @@ EventRoutes.route("/events").post(async (request, response) => {
     tags,
     reminders,
     createdBy,
+    email,
   } = request.body;
 
   const newEvent = {
@@ -36,12 +37,14 @@ EventRoutes.route("/events").post(async (request, response) => {
     tags,
     reminders,
     createdBy,
+    email,
   };
 
   try {
     const result = await db.collection("events").insertOne(newEvent);
-    if (result.insertedCount === 1) {
-      response.status(201).json(result.ops[0]);
+    console.log("Insert result:", result);
+    if (result.insertedId) {
+      response.status(201).json({ _id: result.insertedId, ...newEvent });
     } else {
       throw new Error("Failed to create event");
     }
