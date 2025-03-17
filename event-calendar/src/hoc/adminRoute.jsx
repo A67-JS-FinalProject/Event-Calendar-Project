@@ -8,14 +8,29 @@ export default function AdminRoute({ children }) {
   const location = useLocation();
 
   useEffect(() => {
-    console.log("Current appState:", appState);
+    // Add detailed debugging logs
+    console.group('Admin Route Debug Info');
+    console.log('User:', appState.user);
+    console.log('User Data:', appState.userData);
+    console.log('Role:', appState.userData?.role);
+    console.log('Is Admin?:', appState.userData?.role === 'admin');
+    console.groupEnd();
   }, [appState]);
 
-  if (!appState.user || appState.userData?.role !== 'admin') {
+  // Separate checks for better debugging
+  const isAuthenticated = !!appState.user;
+  const isAdmin = appState.userData?.role === 'admin';
+
+  if (!isAuthenticated || !isAdmin) {
+    console.warn('Admin access denied:', {
+      isAuthenticated,
+      isAdmin,
+      userRole: appState.userData?.role
+    });
     return <Navigate replace to="/" state={{ from: location }} />;
   }
 
-  return <div>{children}</div>;
+  return <>{children}</>;
 }
 
 AdminRoute.propTypes = {
