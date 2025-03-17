@@ -10,6 +10,9 @@ const AdminManagement = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const { appState } = useContext(AppContext);
 
+  // Check if the user is an admin
+  const isAdmin = appState.userRole === 'admin';
+
   const handleSearch = useCallback(async () => {
     try {
       const result = await searchEvents({ query: searchQuery }, appState.token);
@@ -43,70 +46,76 @@ const AdminManagement = () => {
 
   return (
     <div className="bg-white rounded-lg shadow p-6">
-      <div className="mb-4">
-        <input
-          type="text"
-          placeholder="Search events..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full p-2 border rounded"
-        />
-      </div>
+      {isAdmin ? (
+        <>
+          <div className="mb-4">
+            <input
+              type="text"
+              placeholder="Search events..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full p-2 border rounded"
+            />
+          </div>
 
-      <div className="overflow-x-auto">
-        <table className="min-w-full table-auto">
-          <thead>
-            <tr className="bg-gray-100">
-              <th className="px-4 py-2">Title</th>
-              <th className="px-4 py-2">Date</th>
-              <th className="px-4 py-2">Location</th>
-              <th className="px-4 py-2">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {events.map((event) => (
-              <tr key={event._id} className="border-b">
-                <td className="px-4 py-2">{event.title}</td>
-                <td className="px-4 py-2">
-                  {new Date(event.startDate).toLocaleDateString()}
-                </td>
-                <td className="px-4 py-2">{event.location}</td>
-                <td className="px-4 py-2">
-                  <button
-                    onClick={() => handleEdit(event)}
-                    className="bg-blue-500 text-white px-3 py-1 rounded mr-2"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => handleDelete(event._id)}
-                    className="bg-red-500 text-white px-3 py-1 rounded"
-                  >
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+          <div className="overflow-x-auto">
+            <table className="min-w-full table-auto">
+              <thead>
+                <tr className="bg-gray-100">
+                  <th className="px-4 py-2">Title</th>
+                  <th className="px-4 py-2">Date</th>
+                  <th className="px-4 py-2">Location</th>
+                  <th className="px-4 py-2">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {events.map((event) => (
+                  <tr key={event._id} className="border-b">
+                    <td className="px-4 py-2">{event.title}</td>
+                    <td className="px-4 py-2">
+                      {new Date(event.startDate).toLocaleDateString()}
+                    </td>
+                    <td className="px-4 py-2">{event.location}</td>
+                    <td className="px-4 py-2">
+                      <button
+                        onClick={() => handleEdit(event)}
+                        className="bg-blue-500 text-white px-3 py-1 rounded mr-2"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleDelete(event._id)}
+                        className="bg-red-500 text-white px-3 py-1 rounded"
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
 
-      {isEditModalOpen && selectedEvent && (
-        <EditEventModal
-          event={selectedEvent}
-          onClose={() => setIsEditModalOpen(false)}
-          onSave={async (updatedEvent) => {
-            try {
-              await editEvent(selectedEvent._id, updatedEvent, appState.token);
-              setEvents(events.map(e => 
-                e._id === selectedEvent._id ? { ...e, ...updatedEvent } : e
-              ));
-              setIsEditModalOpen(false);
-            } catch (error) {
-              console.error('Error updating event:', error);
-            }
-          }}
-        />
+          {isEditModalOpen && selectedEvent && (
+            <EditEventModal
+              event={selectedEvent}
+              onClose={() => setIsEditModalOpen(false)}
+              onSave={async (updatedEvent) => {
+                try {
+                  await editEvent(selectedEvent._id, updatedEvent, appState.token);
+                  setEvents(events.map(e => 
+                    e._id === selectedEvent._id ? { ...e, ...updatedEvent } : e
+                  ));
+                  setIsEditModalOpen(false);
+                } catch (error) {
+                  console.error('Error updating event:', error);
+                }
+              }}
+            />
+          )}
+        </>
+      ) : (
+        <p>You do not have permission to view this page.</p>
       )}
     </div>
   );
