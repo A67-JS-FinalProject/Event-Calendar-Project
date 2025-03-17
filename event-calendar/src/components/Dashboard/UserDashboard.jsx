@@ -25,6 +25,15 @@ const UserDashboard = () => {
     }
   };
 
+  const handleAdminButtonClick = () => {
+    if (appState.userData?.isAdmin) {
+      // Redirect to admin dashboard or perform admin action
+      window.location.href = '/admin';
+    } else {
+      alert('You do not have admin privileges.');
+    }
+  };
+
   return (
     <div className="flex h-screen bg-gray-100">
       {/* Sidebar */}
@@ -90,6 +99,7 @@ const UserDashboard = () => {
             </div>
           )}
         </div>
+        <button onClick={handleAdminButtonClick}>Admin Dashboard</button>
       </div>
     </div>
   );

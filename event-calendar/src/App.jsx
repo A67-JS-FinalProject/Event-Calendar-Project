@@ -1,7 +1,7 @@
 import "./App.css";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import RenderEvent from "./components/RenderEvent/ViewEvent";
- import Login from "./components/Login/Login";
+import Login from "./components/Login/Login";
 import NotFound from "./components/NotFound/NotFound.jsx";
 import Register from "./components/Register/Register";
 import Home from "./components/Home/Home.jsx";
@@ -12,7 +12,8 @@ import { useState } from "react";
 import Authenticated from "./hoc/authenticated.jsx";
 import Footer from "./components/Footer/Footer.jsx";
 import UserDashboard from './components/Dashboard/UserDashboard';
-import AdminRoute from './hoc/adminRoute.jsx'; // Import AdminRoute
+import AdminRoute from './hoc/adminRoute.jsx';
+import AdminDashboard from './components/AdminDashboard/AdminDashboard';
 
 function App() {
   const [appState, setAppState] = useState({
@@ -31,6 +32,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/home/profile" element={<Authenticated><Profile /></Authenticated>} />
           <Route path="/dashboard" element={<Authenticated><UserDashboard /></Authenticated>} />
+          <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Router>
