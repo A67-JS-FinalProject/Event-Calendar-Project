@@ -11,7 +11,7 @@ export default function AdminRoute({ children }) {
     console.log("Current appState:", appState);
   }, [appState]);
 
-  if (!appState.user || !appState.userData?.isAdmin) {
+  if (!appState.user || appState.userData?.role !== 'admin') {
     return <Navigate replace to="/" state={{ from: location }} />;
   }
 
