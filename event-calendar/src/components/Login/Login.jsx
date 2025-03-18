@@ -3,6 +3,7 @@ import { useContext, useEffect, useState } from "react";
 import { getUserByEmail } from "../../services/usersService.js";
 import { AppContext } from "../../store/app.context.js";
 import { useNavigate } from "react-router-dom";
+import NavBarPublic from "../NavBarPublic/NavBarPublic.jsx";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -47,28 +48,34 @@ const Login = () => {
   }, [userCredentials]);
 
   return (
-    <div className="flex justify-center items-center min-h-screen">
-      <form
-        className="flex flex-col p-4 w-80 bg-black shadow-md rounded"
-        onSubmit={handleSubmit}>
-        <h2 className="text-2xl font-bold mb-4 text-center">Login</h2>
-        <input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="Email"
-          className="mb-2 p-2 border rounded"
-        />
-        <input
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="Password"
-          className="mb-2 p-2 border rounded"
-        />
-        <button type="submit" className="p-2 bg-blue-500 text-black rounded">Login</button>
-      </form>
-    </div>
+    <>
+      <NavBarPublic />
+      <div className="flex justify-center items-center min-h-screen">
+        <form
+          className="flex flex-col p-4 w-80 bg-black shadow-md rounded"
+          onSubmit={handleSubmit}
+        >
+          <h2 className="text-2xl font-bold mb-4 text-center">Login</h2>
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="Email"
+            className="mb-2 p-2 border rounded"
+          />
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Password"
+            className="mb-2 p-2 border rounded"
+          />
+          <button type="submit" className="p-2 bg-blue-500 text-black rounded">
+            Login
+          </button>
+        </form>
+      </div>
+    </>
   );
 };
 
