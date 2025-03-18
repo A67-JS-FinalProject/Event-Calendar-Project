@@ -17,10 +17,16 @@ function CreateAnEvent({ isOpen, onRequestClose }) {
   const [tags, setTags] = useState("");
   const [reminders, setReminders] = useState("");
   const [userData, setUserData] = useState(null);
-
+  const [errors, setErrors] = useState({
+    title: "",
+    participants: "",
+    location: "",
+    description: "",
+  });
   const { appState, setAppState } = useContext(AppContext);
   const { user, token } = appState;
   const navigate = useNavigate();
+
   useEffect(() => {
     const fetchUserData = async () => {
       if (user) {
@@ -33,10 +39,41 @@ function CreateAnEvent({ isOpen, onRequestClose }) {
     fetchUserData();
   }, [user, token]);
 
+  const validateFields = () => {
+    let valid = true;
+    let newErrors = {
+      title: "",
+      participants: "",
+      location: "",
+      description: "",
+    };
+
+    if (title.length < 3 || title.length > 30) {
+      newErrors.title = "Title must be between 3 and 30 characters.";
+      valid = false;
+    }
+
+    if (!location) {
+      newErrors.location = "Location is required.";
+      valid = false;
+    }
+    if (!description || description.length > 500) {
+      newErrors.description = "Description must be at most 500 characters.";
+      valid = false;
+    }
+
+    setErrors(newErrors);
+    return valid;
+  };
+
   const handleCreateEvent = async (e) => {
     e.preventDefault();
     if (!userData) {
       console.error("User data not available");
+      return;
+    }
+
+    if (!validateFields()) {
       return;
     }
 
@@ -47,12 +84,12 @@ function CreateAnEvent({ isOpen, onRequestClose }) {
         endDate,
         location,
         description,
-        participants: participants.split(","),
+        participants: participants.split(",").map((p) => p.trim()),
         isPublic,
         isRecurring,
         coverPhoto,
-        tags: tags.split(","),
-        reminders: reminders.split(","),
+        tags: tags.split(",").map((t) => t.trim()),
+        reminders: reminders.split(",").map((r) => r.trim()),
         createdBy: {
           firstName: userData.firstName,
           lastName: userData.lastName,
@@ -77,14 +114,15 @@ function CreateAnEvent({ isOpen, onRequestClose }) {
       console.error("Error during event creation:", error.message);
     }
   };
+
   if (!isOpen) return null;
   return (
-    <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center ">
+    <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center">
       <div className="bg-black p-6 rounded-lg shadow-md w-96">
-        <button onClick={onRequestClose} className=" text-red-500">
+        <button onClick={onRequestClose} className="text-red-500">
           X
         </button>
-        <form className="flex flex-col " onSubmit={handleCreateEvent}>
+        <form className="flex flex-col" onSubmit={handleCreateEvent}>
           <h2 className="text-2xl font-bold mb-4 text-center">Create Event</h2>
           <label className="mb-2 flex flex-col">
             Title
@@ -93,8 +131,15 @@ function CreateAnEvent({ isOpen, onRequestClose }) {
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Title"
-              className="mb-2 p-2 border rounded"
+              maxLength="30"
+              className={`mb-2 p-2 border rounded ${
+                errors.title ? "border-red-500" : ""
+              }`}
             />
+            <span className="text-gray-500 text-sm">{title.length}/30</span>
+            {errors.title && (
+              <span className="text-red-500">{errors.title}</span>
+            )}
           </label>
           <label className="mb-2 flex flex-col">
             Start Date
@@ -123,8 +168,13 @@ function CreateAnEvent({ isOpen, onRequestClose }) {
               value={location}
               onChange={(e) => setLocation(e.target.value)}
               placeholder="Location"
-              className="mb-2 p-2 border rounded"
+              className={`mb-2 p-2 border rounded ${
+                errors.location ? "border-red-500" : ""
+              }`}
             />
+            {errors.location && (
+              <span className="text-red-500">{errors.location}</span>
+            )}
           </label>
           <label className="mb-2 flex flex-col">
             Description
@@ -132,8 +182,17 @@ function CreateAnEvent({ isOpen, onRequestClose }) {
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Description"
-              className="mb-2 p-2 border rounded"
+              maxLength="500"
+              className={`mb-2 p-2 border rounded ${
+                errors.description ? "border-red-500" : ""
+              }`}
             />
+            <span className="text-gray-500 text-sm">
+              {description.length}/500
+            </span>
+            {errors.description && (
+              <span className="text-red-500">{errors.description}</span>
+            )}
           </label>
           <label className="mb-2 flex flex-col">
             Participants (comma separated)
@@ -142,7 +201,9 @@ function CreateAnEvent({ isOpen, onRequestClose }) {
               value={participants}
               onChange={(e) => setParticipants(e.target.value)}
               placeholder="Participants (comma separated)"
-              className="mb-2 p-2 border rounded"
+              className={`mb-2 p-2 border rounded ${
+                errors.participants ? "border-red-500" : ""
+              }`}
             />
           </label>
           <label className="mb-2 flex flex-col">
