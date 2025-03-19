@@ -3,7 +3,7 @@ import { createEvent } from "../../services/eventService";
 import { AppContext } from "../../store/app.context";
 import { getUserByEmail, updateUserEvent } from "../../services/usersService";
 import { useNavigate } from "react-router-dom";
-
+import axios from "axios";
 function CreateAnEvent({ isOpen, onRequestClose }) {
   const [title, setTitle] = useState("");
   const [startDate, setStartDate] = useState("");
@@ -13,7 +13,10 @@ function CreateAnEvent({ isOpen, onRequestClose }) {
   const [participants, setParticipants] = useState("");
   const [isPublic, setIsPublic] = useState(false);
   const [isRecurring, setIsRecurring] = useState(false);
-  const [coverPhoto, setCoverPhoto] = useState("");
+  const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const [eventCover, setEventCover] = useState("");
   const [tags, setTags] = useState("");
   const [reminders, setReminders] = useState("");
   const [userData, setUserData] = useState(null);
@@ -38,7 +41,41 @@ function CreateAnEvent({ isOpen, onRequestClose }) {
 
     fetchUserData();
   }, [user, token]);
+  const handleFileChange = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
 
+    if (file.size > 2 * 1024 * 1024) {
+      setError("File size must be under 2MB");
+      return;
+    }
+
+    setUploading(true);
+    setError("");
+    setSuccess("");
+
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("upload_preset", "profile_pictures");
+    formData.append("cloud_name", "dglknhf3r");
+    formData.append("folder", "event_pictures");
+
+    try {
+      const response = await axios.post(
+        "https://api.cloudinary.com/v1_1/dglknhf3r/image/upload",
+        formData
+      );
+
+      const imageUrl = response.data.secure_url;
+      setEventCover(imageUrl);
+      setSuccess("Image uploaded successfully!");
+    } catch (error) {
+      console.error("Error uploading image:", error);
+      setError("Image upload failed.");
+    } finally {
+      setUploading(false);
+    }
+  };
   const validateFields = () => {
     let valid = true;
     let newErrors = {
@@ -87,7 +124,7 @@ function CreateAnEvent({ isOpen, onRequestClose }) {
         participants: participants.split(",").map((p) => p.trim()),
         isPublic,
         isRecurring,
-        coverPhoto,
+        eventCover,
         tags: tags.split(",").map((t) => t.trim()),
         reminders: reminders.split(",").map((r) => r.trim()),
         createdBy: {
@@ -223,14 +260,17 @@ function CreateAnEvent({ isOpen, onRequestClose }) {
             Recurring Event
           </label>
           <label className="mb-2 flex flex-col">
-            Cover Photo URL
-            <input
-              type="text"
-              value={coverPhoto}
-              onChange={(e) => setCoverPhoto(e.target.value)}
-              placeholder="Cover Photo URL"
-              className="mb-2 p-2 border rounded"
-            />
+            Add a Cover Photo
+            <fieldset className="fieldset mb-2">
+              <legend className="fieldset-legend">Change Photo</legend>
+              <input
+                type="file"
+                className="file-input"
+                onChange={handleFileChange}
+              />
+              <label className="fieldset-label">Max size 2MB</label>
+            </fieldset>
+            {uploading && <p className="text-blue-500">Uploading...</p>}
           </label>
           <label className="mb-2 flex flex-col">
             Tags (comma separated)
@@ -252,6 +292,8 @@ function CreateAnEvent({ isOpen, onRequestClose }) {
               className="mb-2 p-2 border rounded"
             />
           </label>
+          {error && <p className="text-red-500 mb-4">{error}</p>}
+          {success && <p className="text-green-500 mb-4">{success}</p>}
           <button type="submit" className="p-2 bg-blue-500 text-black rounded">
             Create Event
           </button>
