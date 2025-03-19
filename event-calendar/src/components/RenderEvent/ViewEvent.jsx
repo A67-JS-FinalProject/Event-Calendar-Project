@@ -21,6 +21,8 @@ function RenderEvent() {
     return <div>Loading...</div>;
   }
 
+  console.log("Cover Photo URL:", data.eventCover); // Log the URL to the console
+
   return (
     <>
       <div className="flex flex-col items-center w-screen h-screen mx-auto">
@@ -29,7 +31,7 @@ function RenderEvent() {
           <div
             className="absolute inset-0"
             style={{
-              backgroundImage: `url(${data.coverPhoto})`,
+              backgroundImage: `url(${data.eventCover})`,
               backgroundSize: "cover",
               backgroundPosition: "center",
             }}

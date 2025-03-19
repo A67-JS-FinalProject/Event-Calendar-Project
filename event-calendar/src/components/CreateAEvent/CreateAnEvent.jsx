@@ -56,10 +56,8 @@ function CreateAnEvent({ isOpen, onRequestClose }) {
 
     const formData = new FormData();
     formData.append("file", file);
-    formData.append("upload_preset", "profile_pictures");
+    formData.append("upload_preset", "event_pictures");
     formData.append("cloud_name", "dglknhf3r");
-    formData.append("folder", "event_pictures");
-
     try {
       const response = await axios.post(
         "https://api.cloudinary.com/v1_1/dglknhf3r/image/upload",
