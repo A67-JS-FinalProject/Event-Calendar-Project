@@ -1,8 +1,12 @@
 import { Link } from 'react-router-dom';
+import logo from "../../assets/logo.png";
 
 export default function NavBarPublic() {
     return (
         <nav className="navbar flex justify-center items-center bg-gray-500 p-6">
+            <Link to="/" >
+             <img src={logo} alt="Logo" className="h-8" />
+             </Link>
             <Link to="/login" className="btn btn-error text-white px-6 py-3 text-lg rounded-full mr-6">
                 About Us
             </Link>
