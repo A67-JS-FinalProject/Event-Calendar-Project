@@ -8,12 +8,12 @@ import Home from "./components/Home/Home.jsx";
 import Profile from "./components/Profile/Profile.jsx";
 import LandingPage from "./components/Home/LandingPage.jsx";
 import { AppContext } from "./store/app.context.js";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Authenticated from "./hoc/authenticated.jsx";
 import Footer from "./components/Footer/Footer.jsx";
-import UserDashboard from './components/Dashboard/UserDashboard';
-import AdminRoute from './hoc/adminRoute.jsx';
-import AdminDashboard from './components/AdminDashboard/AdminDashboard';
+import UserDashboard from "./components/Dashboard/UserDashboard";
+import AdminRoute from "./hoc/adminRoute.jsx";
+import AdminDashboard from "./components/AdminDashboard/AdminDashboard";
 
 function App() {
   const [appState, setAppState] = useState({
@@ -21,18 +21,54 @@ function App() {
     userData: null,
     token: null,
   });
+
+  useEffect(() => {
+    const storedState = localStorage.getItem("appState");
+    if (storedState) {
+      setAppState(JSON.parse(storedState));
+    }
+  }, []);
+
   return (
     <AppContext.Provider value={{ appState, setAppState }}>
       <Router>
         <Routes>
           <Route path="/" element={<LandingPage />} />
-          <Route path="/home" element={<Authenticated><Home /></Authenticated>} />
+          <Route
+            path="/home"
+            element={
+              <Authenticated>
+                <Home />
+              </Authenticated>
+            }
+          />
           <Route path="/events/:id" element={<RenderEvent />} />
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/home/profile" element={<Authenticated><Profile /></Authenticated>} />
-          <Route path="/dashboard" element={<Authenticated><UserDashboard /></Authenticated>} />
-          <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
+          <Route
+            path="/home/profile"
+            element={
+              <Authenticated>
+                <Profile />
+              </Authenticated>
+            }
+          />
+          <Route
+            path="/dashboard"
+            element={
+              <Authenticated>
+                <UserDashboard />
+              </Authenticated>
+            }
+          />
+          <Route
+            path="/admin"
+            element={
+              <AdminRoute>
+                <AdminDashboard />
+              </AdminRoute>
+            }
+          />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Router>

@@ -34,12 +34,14 @@ const Login = () => {
         user.getIdToken()
       );
 
-      setAppState({
-        ...appState,
+      const newState = {
         user: userCredentials.email,
         userData: userData,
         token: user,
-      });
+      };
+
+      setAppState(newState);
+      localStorage.setItem("appState", JSON.stringify(newState));
 
       navigate("/home"); // Redirect to home page
     };
