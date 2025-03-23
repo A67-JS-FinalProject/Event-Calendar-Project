@@ -372,6 +372,11 @@ const Home = () => {
                   My Events
                 </button>
               </li>
+              <li>
+                <button onClick={() => navigate("/home/contact-lists")}>
+                  My Contact Lists
+                </button>
+              </li>
             </ul>
           </details>
         </div>

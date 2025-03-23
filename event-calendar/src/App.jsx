@@ -14,6 +14,7 @@ import Footer from "./components/Footer/Footer.jsx";
 import UserDashboard from "./components/Dashboard/UserDashboard";
 import AdminRoute from "./hoc/adminRoute.jsx";
 import AdminDashboard from "./components/AdminDashboard/AdminDashboard";
+import ContactList from "./components/ContactList/ContactList";
 
 function App() {
   const [appState, setAppState] = useState({
@@ -58,6 +59,14 @@ function App() {
             element={
               <Authenticated>
                 <UserDashboard />
+              </Authenticated>
+            }
+          />
+          <Route
+            path="/home/contact-lists"
+            element={
+              <Authenticated>
+                <ContactList />
               </Authenticated>
             }
           />
