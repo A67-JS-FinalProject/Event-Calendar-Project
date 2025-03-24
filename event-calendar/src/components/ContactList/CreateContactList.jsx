@@ -29,7 +29,7 @@ function CreateContactList({ isOpen, onRequestClose }) {
     const handleFormSubmit = async (e) => {
         e.preventDefault(); // Prevent page reload
         const authUser = auth.currentUser;
-    
+
         if (authUser) {
             try {
                 await updateUserContactLists(authUser.email, contactListName, participants);
@@ -52,7 +52,6 @@ function CreateContactList({ isOpen, onRequestClose }) {
     return (
         <div
             className="fixed inset-0 flex items-center justify-center bg-opacity-50"
-            onClick={onRequestClose}
         >
             <div
                 className="bg-white p-6 rounded-lg shadow-lg w-96 relative"
@@ -97,7 +96,11 @@ function CreateContactList({ isOpen, onRequestClose }) {
                                         const response = await fetch('http://localhost:3000/users');
                                         const users = await response.json();
                                         const filteredUsers = users.filter(user =>
-                                            user.email.toLowerCase().includes(query)
+                                            user.email.toLowerCase().includes(query) ||
+                                            (user.phoneNumber && user.phoneNumber.includes(query)) ||
+                                            (user.username && user.username.toLowerCase().includes(query)) ||
+                                            (user.firstName && user.firstName.toLowerCase().includes(query)) ||
+                                            (user.lastName && user.lastName.toLowerCase().includes(query))
                                         );
                                         setSearchResults(filteredUsers);
                                     } catch (error) {
@@ -110,24 +113,38 @@ function CreateContactList({ isOpen, onRequestClose }) {
                         />
                     </label>
                     <ul className="mt-2">
-                        {searchResults.map((user, index) => (
-                            <li
-                                key={index}
-                                className="p-2 border-b cursor-pointer"
-                                onClick={() => {
-                                    setParticipants((prevParticipants) => {
-                                        if (!prevParticipants.some((participant) => participant.email === user.email)) {
-                                            return [...prevParticipants, user];
-                                        }
-                                        return prevParticipants;
-                                    });
-                                    setSearchQuery('');
-                                    setSearchResults([]);
-                                }}
-                            >
-                                {user.email}
-                            </li>
-                        ))}
+                        {searchResults.map((user, index) => {
+                            // Determine what matched the search query
+                            let matchedField = '';
+                            if (user.phoneNumber && user.phoneNumber.includes(searchQuery)) {
+                                matchedField = user.phoneNumber;
+                            } else if (user.username && user.username.toLowerCase().includes(searchQuery)) {
+                                matchedField = user.username;
+                            } else if (user.firstName && user.firstName.toLowerCase().includes(searchQuery)) {
+                                matchedField = user.firstName;
+                            } else if (user.lastName && user.lastName.toLowerCase().includes(searchQuery)) {
+                                matchedField = user.lastName;
+                            }
+
+                            return (
+                                <li
+                                    key={index}
+                                    className="p-2 border-b cursor-pointer"
+                                    onClick={() => {
+                                        setParticipants((prevParticipants) => {
+                                            if (!prevParticipants.some((participant) => participant.email === user.email)) {
+                                                return [...prevParticipants, user];
+                                            }
+                                            return prevParticipants;
+                                        });
+                                        setSearchQuery('');
+                                        setSearchResults([]);
+                                    }}
+                                >
+                                    {user.email} {matchedField && `(${matchedField})`}
+                                </li>
+                            );
+                        })}
                     </ul>
 
                     {/* Render selected participants below the search box */}
@@ -136,7 +153,7 @@ function CreateContactList({ isOpen, onRequestClose }) {
                         <ul>
                             {participants.map((participant, index) => (
                                 <li key={index} className="p-2 border rounded mb-2">
-                                    {participant.email}
+                                    {participant.email} {participant.phone && `(${participant.phone})`}
                                     <button
                                         className="ml-2 text-red-500"
                                         onClick={() => {
