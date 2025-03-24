@@ -15,6 +15,7 @@ import UserDashboard from "./components/Dashboard/UserDashboard";
 import AdminRoute from "./hoc/adminRoute.jsx";
 import AdminDashboard from "./components/AdminDashboard/AdminDashboard";
 import ContactList from "./components/ContactList/ContactList";
+import SingleContactView from "./components/ContactList/SingleContactView.jsx";
 
 function App() {
   const [appState, setAppState] = useState({
@@ -74,6 +75,12 @@ function App() {
             path="/admin"
             element={
                 <AdminDashboard />
+            }
+          />
+          <Route
+            path="/home/contact-lists/:listName"
+            element={
+                <SingleContactView/>
             }
           />
           <Route path="*" element={<NotFound />} />
