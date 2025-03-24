@@ -4,6 +4,7 @@ import { AppContext } from "../../store/app.context";
 import { getUserByEmail, updateUserEvent } from "../../services/usersService";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+
 function CreateAnEvent({ isOpen, onRequestClose }) {
   const [title, setTitle] = useState("");
   const [startDate, setStartDate] = useState("");
@@ -41,6 +42,7 @@ function CreateAnEvent({ isOpen, onRequestClose }) {
 
     fetchUserData();
   }, [user, token]);
+
   const handleFileChange = async (event) => {
     const file = event.target.files[0];
     if (!file) return;
@@ -56,7 +58,6 @@ function CreateAnEvent({ isOpen, onRequestClose }) {
 
     const formData = new FormData();
     formData.append("file", file);
-    formData.append("upload_preset", "event_pictures");
     formData.append("upload_preset", "event_pictures");
     formData.append("cloud_name", "dglknhf3r");
     try {
@@ -75,6 +76,7 @@ function CreateAnEvent({ isOpen, onRequestClose }) {
       setUploading(false);
     }
   };
+
   const validateFields = () => {
     let valid = true;
     let newErrors = {
@@ -153,12 +155,15 @@ function CreateAnEvent({ isOpen, onRequestClose }) {
 
   if (!isOpen) return null;
   return (
-    <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center">
-      <div className="bg-black p-6 rounded-lg shadow-md w-96">
-        <button onClick={onRequestClose} className="text-red-500">
-          X
+    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 overflow-y-auto p-4">
+      <div className="relative bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md w-96 max-h-[90vh] overflow-y-auto my-8 dark:text-white dark:border-gray-600">
+        <button
+          onClick={onRequestClose}
+          className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white"
+        >
+          ✕
         </button>
-        <form className="flex flex-col" onSubmit={handleCreateEvent}>
+        <form className="flex flex-col space-y-4" onSubmit={handleCreateEvent}>
           <h2 className="text-2xl font-bold mb-4 text-center">Create Event</h2>
           <label className="mb-2 flex flex-col">
             Title
@@ -293,7 +298,10 @@ function CreateAnEvent({ isOpen, onRequestClose }) {
           </label>
           {error && <p className="text-red-500 mb-4">{error}</p>}
           {success && <p className="text-green-500 mb-4">{success}</p>}
-          <button type="submit" className="p-2 bg-blue-500 text-black rounded">
+          <button
+            type="submit"
+            className="p-2 bg-blue-500 text-white rounded hover:bg-blue-600 mt-4 dark:bg-blue-600 dark:hover:bg-blue-500"
+          >
             Create Event
           </button>
         </form>
