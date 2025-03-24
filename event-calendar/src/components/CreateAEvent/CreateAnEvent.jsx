@@ -122,7 +122,11 @@ function CreateAnEvent({ isOpen, onRequestClose }) {
         endDate,
         location,
         description,
-        participants: participants.split(",").map((p) => p.trim()),
+        participants: participants.split(",").map((p) => p.trim()).map(email => ({
+          email: email,
+          status: 'pending',
+          role: email === userData.email ? 'organizer' : 'invitee' // This marks the creator as organizer
+        })),
         isPublic,
         isRecurring,
         eventCover,
@@ -131,9 +135,11 @@ function CreateAnEvent({ isOpen, onRequestClose }) {
         createdBy: {
           firstName: userData.firstName,
           lastName: userData.lastName,
+          email: userData.email
         },
-        email: userData.email,
+        organizer: userData.email // Set the creator as organizer
       };
+
       const createdEvent = await createEvent(event, token);
       if (!createdEvent) {
         console.error("Event creation failed");

@@ -100,9 +100,13 @@ const EventManager = () => {
                   </p>
                   <p className="text-sm text-gray-500 dark:text-gray-400">{event.location}</p>
                 </div>
-                {event.organizer === appState.user?.uid && (
+                {event.organizer === appState.user?.uid ? (
                   <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded dark:bg-blue-500 dark:text-blue-100">
                     Organizer
+                  </span>
+                ) : (
+                  <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded dark:bg-green-500 dark:text-green-100">
+                    Invited
                   </span>
                 )}
               </div>

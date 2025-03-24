@@ -32,7 +32,11 @@ EventRoutes.route("/events").post(async (request, response) => {
     endDate,
     location,
     description,
-    participants,
+    participants: participants.map(p => ({
+      ...p,
+      status: p.email === request.body.organizer ? 'accepted' : 'pending',
+      role: p.email === request.body.organizer ? 'organizer' : 'invitee'
+    })),
     isPublic,
     isRecurring,
     eventCover,
