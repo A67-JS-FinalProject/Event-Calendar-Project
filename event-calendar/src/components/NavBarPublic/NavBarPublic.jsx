@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import logo from "../../assets/logo.png";
 
-export default function NavBarPublic() {
+export default function NavBarPublic({ isAdmin }) {
     return (
         <nav className="navbar flex justify-center items-center bg-gray-500 p-6">
             <Link to="/" >
@@ -21,6 +21,11 @@ export default function NavBarPublic() {
                 <Link to="/register" className="btn btn-error text-white px-6 py-3 text-lg rounded-full">
                     Register
                 </Link>
+                {isAdmin && (
+                    <Link to="/admin/dashboard" className="admin-button">
+                        Admin Dashboard
+                    </Link>
+                )}
             </div>
         </nav>
     );

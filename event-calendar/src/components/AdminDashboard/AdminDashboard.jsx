@@ -1,14 +1,14 @@
 import { useContext, useState } from 'react';
 import { AppContext } from '../../store/app.context';
-import PersonalCalendar from './PersonalCalendar';
-import EventManager from './EventManager';
+import PersonalCalendar from '../Dashboard/PersonalCalendar'; // Fixed import path
+import EventManager from '../Dashboard/EventManager'; // Fixed import path
 import EventInvitationsList from '../Events/EventInvitationsList';
-import CreateAnEvent from '../Events/CreateAnEvent'; // Assuming this is your component for creating events
+import CreateAnEvent from '../CreateAEvent/CreateAnEvent'; // Fixed import path
 import { FaCog, FaCalendarAlt, FaSignOutAlt } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import { logout } from '../../services/authenticationService';
 
-const UserDashboard = () => {
+const AdminDashboard = () => {
   const { appState, setAppState } = useContext(AppContext);
   const [activeSection, setActiveSection] = useState('calendar');
   const navigate = useNavigate();
@@ -109,4 +109,4 @@ const UserDashboard = () => {
   );
 };
 
-export default UserDashboard;
+export default AdminDashboard;
