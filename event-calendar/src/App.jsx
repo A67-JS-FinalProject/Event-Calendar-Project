@@ -73,9 +73,7 @@ function App() {
           <Route
             path="/admin"
             element={
-              <AdminRoute>
                 <AdminDashboard />
-              </AdminRoute>
             }
           />
           <Route path="*" element={<NotFound />} />

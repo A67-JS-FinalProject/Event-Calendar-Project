@@ -3,7 +3,6 @@ import { AppContext } from '../../store/app.context';
 import PersonalCalendar from '../Dashboard/PersonalCalendar'; // Fixed import path
 import EventManager from '../Dashboard/EventManager'; // Fixed import path
 import EventInvitationsList from '../Events/EventInvitationsList';
-import CreateAnEvent from '../CreateAEvent/CreateAnEvent'; // Fixed import path
 import { FaCog, FaCalendarAlt, FaSignOutAlt } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import { logout } from '../../services/authenticationService';
@@ -95,7 +94,6 @@ const AdminDashboard = () => {
               <div className="col-span-1">
                 <EventManager />
                 <EventInvitationsList />
-                <CreateAnEvent isOpen={true} onRequestClose={() => {}} /> {/* Make sure CreateAnEvent is used here */}
               </div>
             </>
           ) : (
