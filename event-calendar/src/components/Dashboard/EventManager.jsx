@@ -38,14 +38,22 @@ const EventManager = () => {
   }, [filter, appState.token, appState.user]);
 
   const getFilteredEvents = () => {
+    if (!events) return [];
+    
     const now = new Date();
+    const currentUserEmail = appState.user?.email; // Get the current user's email
+
     switch (filter) {
       case 'upcoming':
-        return events.filter(event => new Date(event.startDate) >= now);
+        return events.filter(event => new Date(event.startDate) > now);
       case 'past':
         return events.filter(event => new Date(event.startDate) < now);
       case 'created':
-        return events.filter(event => event.organizer === appState.user?.uid);
+        // Only show events where the current user is the organizer
+        return events.filter(event => 
+          event.organizer === appState.user?.uid || 
+          event.createdBy?.email === currentUserEmail
+        );
       default:
         return events;
     }
@@ -94,13 +102,17 @@ const EventManager = () => {
             >
               <div className="flex justify-between items-start">
                 <div>
-                  <h3 className="font-semibold text-gray-800 dark:text-white">{event.title}</h3>
+                  <h3 className="font-semibold text-gray-800 dark:text-white">
+                    {event.title}
+                  </h3>
                   <p className="text-sm text-gray-600 dark:text-gray-300">
                     {new Date(event.startDate).toLocaleDateString()}
                   </p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">{event.location}</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    {event.location}
+                  </p>
                 </div>
-                {event.organizer === appState.user?.uid ? (
+                {(event.organizer === appState.user?.uid || event.createdBy?.email === appState.user?.email) ? (
                   <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded dark:bg-blue-500 dark:text-blue-100">
                     Organizer
                   </span>
