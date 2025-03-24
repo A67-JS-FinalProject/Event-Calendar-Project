@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import PropTypes from 'prop-types';
 
-const ManageParticipants = ({ eventId, participants, onUpdate, currentUserEmail }) => {
+const ManageParticipants = ({ participants, onUpdate, currentUserEmail }) => {
   const [newParticipant, setNewParticipant] = useState('');
   const [error, setError] = useState('');
 
@@ -24,7 +24,7 @@ const ManageParticipants = ({ eventId, participants, onUpdate, currentUserEmail 
       await onUpdate(updatedParticipants);
       setNewParticipant('');
       setError('');
-    } catch (error) {
+    } catch {
       setError('Failed to add participant');
     }
   };
@@ -38,7 +38,7 @@ const ManageParticipants = ({ eventId, participants, onUpdate, currentUserEmail 
     try {
       const updatedParticipants = participants.filter(p => p.email !== emailToRemove);
       await onUpdate(updatedParticipants);
-    } catch (error) {
+    } catch {
       setError('Failed to remove participant');
     }
   };
