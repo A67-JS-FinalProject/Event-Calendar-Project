@@ -241,4 +241,32 @@ EventRoutes.route("/admin/events/:id").delete(
   }
 );
 
+// Add this route to handle invitation responses
+EventRoutes.route("/events/invitations/:id/respond").post(async (request, response) => {
+  const db = database.getDb();
+  try {
+    const { userId, response: inviteResponse } = request.body;
+    const result = await db.collection("events").updateOne(
+      { 
+        _id: new ObjectId(request.params.id),
+        "participants": userId 
+      },
+      { 
+        $set: { 
+          "participants.$.status": inviteResponse,
+          "participants.$.respondedAt": new Date()
+        }
+      }
+    );
+
+    if (result.modifiedCount === 0) {
+      response.status(404).json({ error: "Invitation not found or already processed" });
+    } else {
+      response.status(200).json({ message: "Invitation response recorded successfully" });
+    }
+  } catch (error) {
+    response.status(500).json({ error: error.message });
+  }
+});
+
 export default EventRoutes;

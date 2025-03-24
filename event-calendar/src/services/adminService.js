@@ -1,47 +1,50 @@
-const URL = `http://localhost:3000`;
+const BASE_URL = 'http://localhost:3000/admin';
 
 export const searchEvents = async (query, token) => {
   try {
-    const response = await fetch(`${URL}/admin/events/search?${new URLSearchParams(query)}`, {
+    const response = await fetch(`${BASE_URL}/events/search?${new URLSearchParams(query)}`, {
       headers: {
-        Authorization: `Bearer ${token}`,
-      },
+        'Authorization': `Bearer ${token}`
+      }
     });
-    const data = await response.json();
-    return data;
+    if (!response.ok) throw new Error('Failed to search events');
+    return await response.json();
   } catch (error) {
-    console.error("Error fetching data:", error);
+    console.error('Error searching events:', error);
+    throw error;
   }
 };
 
 export const editEvent = async (id, event, token) => {
   try {
-    const response = await fetch(`${URL}/admin/events/${id}`, {
-      method: "PUT",
+    const response = await fetch(`${BASE_URL}/events/${id}`, {
+      method: 'PUT',
       headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
       },
-      body: JSON.stringify(event),
+      body: JSON.stringify(event)
     });
-    const data = await response.json();
-    return data;
+    if (!response.ok) throw new Error('Failed to edit event');
+    return await response.json();
   } catch (error) {
-    console.error("Error updating event:", error);
+    console.error('Error editing event:', error);
+    throw error;
   }
 };
 
 export const deleteEvent = async (id, token) => {
   try {
-    const response = await fetch(`${URL}/admin/events/${id}`, {
-      method: "DELETE",
+    const response = await fetch(`${BASE_URL}/events/${id}`, {
+      method: 'DELETE',
       headers: {
-        Authorization: `Bearer ${token}`,
-      },
+        'Authorization': `Bearer ${token}`
+      }
     });
-    const data = await response.json();
-    return data;
+    if (!response.ok) throw new Error('Failed to delete event');
+    return await response.json();
   } catch (error) {
-    console.error("Error deleting event:", error);
+    console.error('Error deleting event:', error);
+    throw error;
   }
 };

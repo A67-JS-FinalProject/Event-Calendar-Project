@@ -1,83 +1,84 @@
-import { useState, useEffect, useContext } from 'react';
+import { useContext, useState } from 'react';
 import { AppContext } from '../../store/app.context';
-import AdminManagement from './AdminManagement';
+import { FaCog, FaCalendarAlt, FaSignOutAlt } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
 
-const AdminDashboard = () => {
-    const [stats, setStats] = useState({
-        totalEvents: 0,
-        activeEvents: 0,
-        totalUsers: 0
-    });
-    const { appState } = useContext(AppContext);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+const UserDashboard = () => {
+  const { appState, setAppState } = useContext(AppContext);
+  const [activeSection, setActiveSection] = useState('calendar');
+  const navigate = useNavigate();
 
-    useEffect(() => {
-        const fetchStats = async () => {
-            try {
-                setLoading(true);
-                const response = await fetch('http://localhost:3000/api/admin/stats', {
-                    headers: {
-                        'Authorization': `Bearer ${appState.token}`
-                    }
-                });
-
-                if (!response.ok) {
-                    throw new Error('Failed to fetch statistics');
-                }
-
-                const data = await response.json();
-                
-                setStats({
-                    totalEvents: data.events.total,
-                    activeEvents: data.events.active,
-                    totalUsers: data.users.total
-                });
-            } catch (error) {
-                console.error('Error fetching dashboard stats:', error);
-                setError(error.message);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        if (appState.token) {
-            fetchStats();
-        }
-    }, [appState.token]);
-
-    if (loading) {
-        return <div className="p-6">Loading statistics...</div>;
+  const handleLogout = async () => {
+    try {
+      await logout();
+      setAppState({
+        user: null,
+        userData: null,
+        token: null,
+      });
+      navigate('/login');
+    } catch (error) {
+      console.error('Logout failed:', error);
     }
+  };
 
-    if (error) {
-        return <div className="p-6 text-red-500">Error: {error}</div>;
-    }
-
-    return (
+  return (
+    <div className="flex h-screen bg-gray-100 dark:bg-gray-900">
+      {/* Sidebar */}
+      <div className="w-64 bg-white shadow-lg dark:bg-gray-800">
         <div className="p-6">
-            <h1 className="text-2xl font-bold mb-6">Admin Dashboard</h1>
-            
-            {/* Dashboard Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                <div className="bg-white p-4 rounded-lg shadow">
-                    <h3 className="text-gray-500 text-sm">Total Events</h3>
-                    <p className="text-2xl font-bold">{stats.totalEvents}</p>
-                </div>
-                <div className="bg-white p-4 rounded-lg shadow">
-                    <h3 className="text-gray-500 text-sm">Active Events</h3>
-                    <p className="text-2xl font-bold">{stats.activeEvents}</p>
-                </div>
-                <div className="bg-white p-4 rounded-lg shadow">
-                    <h3 className="text-gray-500 text-sm">Total Users</h3>
-                    <p className="text-2xl font-bold">{stats.totalUsers}</p>
-                </div>
-            </div>
-
-            {/* Admin Management Section */}
-            <AdminManagement />
+          <h2 className="text-xl font-semibold text-gray-800 dark:text-white">
+            {appState.userData?.username}&apos;s Dashboard
+          </h2>
         </div>
-    );
+        <nav className="mt-6">
+          <button
+            className={`w-full flex items-center px-6 py-3 ${
+              activeSection === 'calendar' ? 'bg-blue-50 text-blue-600 dark:bg-blue-800 dark:text-blue-300' : 'text-gray-600 dark:text-gray-400'
+            }`}
+            onClick={() => setActiveSection('calendar')}
+          >
+            <FaCalendarAlt className="mr-3" />
+            Calendar
+          </button>
+
+          {/* Admin Dashboard button - visible only if user is admin */}
+          {appState.userData?.isAdmin && (
+            <button
+              className="w-full flex items-center px-6 py-3 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700"
+              onClick={() => navigate('/admin')}
+            >
+              <FaCog className="mr-3" />
+              Admin Dashboard
+            </button>
+          )}
+
+          <button
+            className={`w-full flex items-center px-6 py-3 ${
+              activeSection === 'settings' ? 'bg-blue-50 text-blue-600 dark:bg-blue-800 dark:text-blue-300' : 'text-gray-600 dark:text-gray-400'
+            }`}
+            onClick={() => setActiveSection('settings')}
+          >
+            <FaCog className="mr-3" />
+            Settings
+          </button>
+
+          <button
+            className="w-full flex items-center px-6 py-3 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700"
+            onClick={handleLogout}
+          >
+            <FaSignOutAlt className="mr-3" />
+            Logout
+          </button>
+        </nav>
+      </div>
+
+      {/* Main Content */}
+      <div className="flex-1 p-8">
+        {/* ... rest of your main content ... */}
+      </div>
+    </div>
+  );
 };
 
-export default AdminDashboard;
+export default UserDashboard;
