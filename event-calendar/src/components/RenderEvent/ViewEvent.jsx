@@ -106,7 +106,7 @@ function RenderEvent() {
           <p className="text-black">{data.description}</p>
           <p className="text-black">Location: {data.location}</p>
           <p className="text-black">
-            Participants: {data.participants.join(", ")}
+            Participants: {data.participants.map(p => p.email).join(", ")}
           </p>
           {isOrganizer && (
             <ManageParticipants
