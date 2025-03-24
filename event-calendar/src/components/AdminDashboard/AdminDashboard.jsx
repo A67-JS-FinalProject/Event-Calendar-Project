@@ -1,7 +1,12 @@
 import { useContext, useState } from 'react';
 import { AppContext } from '../../store/app.context';
+import PersonalCalendar from './PersonalCalendar';
+import EventManager from './EventManager';
+import EventInvitationsList from '../Events/EventInvitationsList';
+import CreateAnEvent from '../Events/CreateAnEvent'; // Assuming this is your component for creating events
 import { FaCog, FaCalendarAlt, FaSignOutAlt } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
+import { logout } from '../../services/authenticationService';
 
 const UserDashboard = () => {
   const { appState, setAppState } = useContext(AppContext);
@@ -75,7 +80,30 @@ const UserDashboard = () => {
 
       {/* Main Content */}
       <div className="flex-1 p-8">
-        {/* ... rest of your main content ... */}
+        <header className="flex justify-between items-center mb-8">
+          <h1 className="text-2xl font-bold text-gray-800 dark:text-white">
+            {activeSection === 'calendar' ? 'My Calendar' : 'Settings'}
+          </h1>
+        </header>
+
+        <div className="grid grid-cols-3 gap-6">
+          {activeSection === 'calendar' ? (
+            <>
+              <div className="col-span-2">
+                <PersonalCalendar />
+              </div>
+              <div className="col-span-1">
+                <EventManager />
+                <EventInvitationsList />
+                <CreateAnEvent isOpen={true} onRequestClose={() => {}} /> {/* Make sure CreateAnEvent is used here */}
+              </div>
+            </>
+          ) : (
+            <div className="col-span-3">
+              {/* Settings content here */}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

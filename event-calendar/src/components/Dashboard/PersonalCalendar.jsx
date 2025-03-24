@@ -41,26 +41,26 @@ const PersonalCalendar = () => {
   const renderCalendarHeader = () => (
     <div className="flex justify-between items-center mb-4">
       <div>
-        <h2 className="text-xl font-semibold">
+        <h2 className="text-xl font-semibold text-gray-800 dark:text-white">
           {selectedDate.toLocaleString('default', { month: 'long', year: 'numeric' })}
         </h2>
       </div>
       <div className="flex gap-2">
         <button
           onClick={() => setSelectedDate(new Date(selectedDate.setMonth(selectedDate.getMonth() - 1)))}
-          className="px-3 py-1 bg-gray-100 rounded hover:bg-gray-200"
+          className="px-3 py-1 bg-gray-100 rounded hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-300"
         >
           Previous
         </button>
         <button
           onClick={() => setSelectedDate(new Date())}
-          className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
+          className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-500"
         >
           Today
         </button>
         <button
           onClick={() => setSelectedDate(new Date(selectedDate.setMonth(selectedDate.getMonth() + 1)))}
-          className="px-3 py-1 bg-gray-100 rounded hover:bg-gray-200"
+          className="px-3 py-1 bg-gray-100 rounded hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-300"
         >
           Next
         </button>
@@ -73,7 +73,7 @@ const PersonalCalendar = () => {
     return (
       <div className="grid grid-cols-7 gap-1 mb-2">
         {days.map(day => (
-          <div key={day} className="text-center font-semibold py-2">
+          <div key={day} className="text-center font-semibold py-2 text-gray-800 dark:text-white">
             {day}
           </div>
         ))}
@@ -89,7 +89,7 @@ const PersonalCalendar = () => {
     const cells = [];
 
     for (let i = 0; i < firstDay; i++) {
-      cells.push(<div key={`empty-${i}`} className="h-24 bg-gray-50 border"></div>);
+      cells.push(<div key={`empty-${i}`} className="h-24 bg-gray-50 dark:bg-gray-700 border"></div>);
     }
 
     for (let day = 1; day <= daysInMonth; day++) {
@@ -103,14 +103,16 @@ const PersonalCalendar = () => {
       cells.push(
         <div
           key={day}
-          className={`h-24 border p-2 ${isToday ? 'bg-blue-50' : 'bg-white'}`}
+          className={`h-24 border p-2 ${isToday ? 'bg-blue-50 dark:bg-blue-600' : 'bg-white dark:bg-gray-800'} `}
         >
-          <div className={`font-semibold ${isToday ? 'text-blue-600' : ''}`}>{day}</div>
+          <div className={`font-semibold ${isToday ? 'text-blue-600 dark:text-blue-200' : 'text-gray-800 dark:text-white'}`}>
+            {day}
+          </div>
           <div className="overflow-y-auto h-16">
             {dayEvents.map(event => (
               <div
                 key={event.id}
-                className="text-xs p-1 mb-1 bg-blue-100 rounded truncate"
+                className="text-xs p-1 mb-1 bg-blue-100 dark:bg-blue-500 rounded truncate"
                 title={event.title}
               >
                 {event.title}
@@ -125,7 +127,7 @@ const PersonalCalendar = () => {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow p-6">
+    <div className="bg-white dark:bg-gray-900 rounded-lg shadow p-6">
       {renderCalendarHeader()}
       {renderCalendarDays()}
       {renderCalendarCells()}
