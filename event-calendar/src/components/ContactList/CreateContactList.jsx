@@ -25,21 +25,9 @@ function CreateContactList({ isOpen, onRequestClose }) {
 
     const handleInputChange = async (e) => {
         const newListName = e.target.value;
-    
         try {
-            // Fetch the user's contact lists from MongoDB
-            const lists = await getContactLists(auth.currentUser.email);
-            
-            // Check if the list name already exists
-            if (lists.includes(newListName)) {
-                alert("List name already exists. Please choose a different name.");
-                return;
-            }
-    
-            // Set the new contact list name if it's unique
             setContactListName(newListName);
-        } catch (error) {
-            console.error("Error checking contact list names:", error);
+        } catch {
             alert("An error occurred while checking the contact list. Please try again.");
         }
     };
