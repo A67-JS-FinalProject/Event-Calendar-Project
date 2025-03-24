@@ -253,7 +253,7 @@ EventRoutes.route("/events/invitations/:id/respond").post(async (request, respon
     const result = await db.collection("events").updateOne(
       { 
         _id: new ObjectId(request.params.id),
-        "participants": userId 
+        "participants.email": userId // Ensure matching by email field
       },
       { 
         $set: { 

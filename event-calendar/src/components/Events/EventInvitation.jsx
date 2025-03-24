@@ -9,7 +9,7 @@ const EventInvitation = ({ invitation, currentUser, onResponseSubmit }) => {
     setIsLoading(true);
     setError(null);
     try {
-      await fetch(`http://localhost:3000/events/invitations/${invitation.id}/respond`, {
+      const result = await fetch(`http://localhost:3000/events/invitations/${invitation.id}/respond`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -19,6 +19,10 @@ const EventInvitation = ({ invitation, currentUser, onResponseSubmit }) => {
           response: response
         })
       });
+
+      if (!result.ok) {
+        throw new Error('Failed to update invitation');
+      }
 
       onResponseSubmit(response);
     } catch (error) {

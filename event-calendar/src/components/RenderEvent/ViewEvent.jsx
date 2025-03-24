@@ -1,11 +1,14 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import { useParams } from "react-router-dom";
 import { getEventById } from "../../services/eventService";
 import { CiCalendar } from "react-icons/ci";
 import { FaClock } from "react-icons/fa6";
+import { AppContext } from "../../store/app.context";
+import ManageParticipants from '../Events/ManageParticipants';
 
 function RenderEvent() {
   const { id } = useParams();
+  const { appState } = useContext(AppContext);
   const [data, setData] = useState(null);
 
   useEffect(() => {
@@ -20,8 +23,16 @@ function RenderEvent() {
   if (!data) {
     return <div>Loading...</div>;
   }
+  const isOrganizer = data?.organizer === appState.user;
 
   console.log("Cover Photo URL:", data.eventCover); // Log the URL to the console
+  
+  const handleUpdateParticipants = (updatedParticipants) => {
+    setData((prevData) => ({
+      ...prevData,
+      participants: updatedParticipants,
+    }));
+  };
 
   return (
     <>
@@ -63,7 +74,7 @@ function RenderEvent() {
           <div className="flex flex-row mb-4 justify-between  ">
             <div className="flex flex-col items-start mb-4">
               <div className="flex flex-row items-center mb-4">
-                <CiCalendar className="text-pink-500 mr-2" />;
+                <CiCalendar className="text-pink-500 mr-2" />
                 <p className="text-black">
                   {new Date(data.startDate).toLocaleDateString("en-GB", {
                     weekday: "short",
@@ -74,7 +85,7 @@ function RenderEvent() {
                 </p>
               </div>
               <div className="flex flex-row items-center mb-4  ">
-                <FaClock className="text-pink-500 mr-2" />;
+                <FaClock className="text-pink-500 mr-2" />
                 <p className="text-black">
                   {new Date(data.startDate).toLocaleTimeString("en-GB", {
                     hour: "2-digit",
@@ -83,7 +94,9 @@ function RenderEvent() {
                 </p>
               </div>
             </div>
-            <button className="btn w-90 h-17">Join the event</button>
+            {!isOrganizer && (
+              <button className="btn w-90 h-17">Join the event</button>
+            )}
           </div>
           <hr className=" w-full h-3 text-black" />
           <h1 className="text-black text-4xl   font-semibold">
@@ -95,6 +108,14 @@ function RenderEvent() {
           <p className="text-black">
             Participants: {data.participants.join(", ")}
           </p>
+          {isOrganizer && (
+            <ManageParticipants
+              eventId={id}
+              participants={data.participants}
+              onUpdate={handleUpdateParticipants}
+              currentUserEmail={appState.user}
+            />
+          )}
           <p className="text-black">Public: {data.isPublic ? "Yes" : "No"}</p>
           <p className="text-black">
             Recurring: {data.isRecurring ? "Yes" : "No"}

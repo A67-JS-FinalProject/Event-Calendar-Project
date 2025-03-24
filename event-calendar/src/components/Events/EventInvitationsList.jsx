@@ -6,38 +6,37 @@ function EventInvitationsList() {
   const [invitations, setInvitations] = useState([]);
   const { appState } = useContext(AppContext);
   
+  const fetchInvitations = async () => {
+    try {
+      const response = await fetch(`http://localhost:3000/events`, {
+        headers: {
+          'Authorization': `Bearer ${appState.token}`
+        }
+      });
+      const data = await response.json();
+      
+      // Filter events where user is an invitee and has pending status
+      const userInvitations = data.filter(event => 
+        event.participants.some(p => 
+          p.email === appState.user && 
+          p.role === 'invitee' && 
+          p.status === 'pending'
+        )
+      ).map(event => ({
+        id: event._id,
+        eventTitle: event.title,
+        eventDate: event.startDate,
+        senderName: `${event.createdBy.firstName} ${event.createdBy.lastName}`,
+        status: event.participants.find(p => p.email === appState.user)?.status || 'pending'
+      }));
+
+      setInvitations(userInvitations);
+    } catch (error) {
+      console.error('Error fetching invitations:', error);
+    }
+  };
+
   useEffect(() => {
-    // Fetch invitations for the current user
-    const fetchInvitations = async () => {
-      try {
-        const response = await fetch(`http://localhost:3000/events`, {
-          headers: {
-            'Authorization': `Bearer ${appState.token}`
-          }
-        });
-        const data = await response.json();
-        
-        // Filter events where user is an invitee (not organizer) and has pending status
-        const userInvitations = data.filter(event => 
-          event.participants.some(p => 
-            p.email === appState.user && 
-            p.role === 'invitee' && 
-            p.status === 'pending'
-          ) && event.organizer !== appState.user
-        ).map(event => ({
-          id: event._id,
-          eventTitle: event.title,
-          eventDate: event.startDate,
-          senderName: `${event.createdBy.firstName} ${event.createdBy.lastName}`,
-          status: event.participants.find(p => p.email === appState.user)?.status || 'pending'
-        }));
-
-        setInvitations(userInvitations);
-      } catch (error) {
-        console.error('Error fetching invitations:', error);
-      }
-    };
-
     if (appState.user) {
       fetchInvitations();
     }
@@ -54,14 +53,8 @@ function EventInvitationsList() {
         body: JSON.stringify({ response })
       });
 
-      // Update local state to reflect the change
-      setInvitations(prevInvitations => 
-        prevInvitations.map(inv => 
-          inv.id === invitationId 
-            ? { ...inv, status: response }
-            : inv
-        )
-      );
+      // Refresh invitations list after response
+      fetchInvitations();  // This refreshes the list after a response is submitted
     } catch (error) {
       console.error('Error updating invitation:', error);
     }

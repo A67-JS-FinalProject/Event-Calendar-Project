@@ -116,16 +116,24 @@ function CreateAnEvent({ isOpen, onRequestClose }) {
     }
 
     try {
+      // Create array of participant emails including the creator
+      let participantEmails = participants
+        ? participants.split(",").map(p => p.trim())
+        : [];
+      if (!participantEmails.includes(userData.email)) {
+        participantEmails.push(userData.email);
+      }
+
       const event = {
         title,
         startDate,
         endDate,
         location,
         description,
-        participants: participants.split(",").map((p) => p.trim()).map(email => ({
-          email: email,
-          status: 'pending',
-          role: email === userData.email ? 'organizer' : 'invitee' // This marks the creator as organizer
+        participants: participantEmails.map(email => ({
+          email,
+          status: email === userData.email ? 'accepted' : 'pending',
+          role: email === userData.email ? 'organizer' : 'invitee'
         })),
         isPublic,
         isRecurring,
@@ -137,7 +145,7 @@ function CreateAnEvent({ isOpen, onRequestClose }) {
           lastName: userData.lastName,
           email: userData.email
         },
-        organizer: userData.email // Set the creator as organizer
+        organizer: userData.email
       };
 
       const createdEvent = await createEvent(event, token);
