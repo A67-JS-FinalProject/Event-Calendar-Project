@@ -50,7 +50,7 @@ function CreateAnEvent({ isOpen, onRequestClose }) {
     description: "",
   });
 
-  const { appState, setAppState } = useContext(AppContext);
+  const { appState } = useContext(AppContext);
   const { user, token } = appState;
   const navigate = useNavigate();
 

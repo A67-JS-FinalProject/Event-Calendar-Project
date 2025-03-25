@@ -14,6 +14,7 @@ import { toggleBlockUser as toggleBlockUserService } from "../../services/usersS
 import {
   editEvent as editEventService,
   deleteEvent as deleteEventService,
+  deleteRecurringEvents, // Ensure this is imported
 } from "../../services/eventService";
 
 const UserManagementDashboard = () => {
@@ -29,24 +30,27 @@ const UserManagementDashboard = () => {
   const itemsPerPage = 5;
 
   useEffect(() => {
-    const fetchUsers = async () => {
-      const fetchedUsers = await getAllUsers(token);
-      setUsers(fetchedUsers);
-    };
-
-    const fetchEvents = async () => {
-      try {
-        const fetchedEvents = await getAllEvents(token);
-        console.log("Fetched events:", fetchedEvents); // Debug log
-        setEvents(fetchedEvents);
-      } catch (error) {
-        console.error("Error fetching events:", error); // Error log
-      }
-    };
-
     fetchUsers();
     fetchEvents();
   }, [token]);
+
+  const fetchUsers = async () => {
+    try {
+      const fetchedUsers = await getAllUsers(token);
+      setUsers(fetchedUsers);
+    } catch (error) {
+      console.error("Error fetching users:", error);
+    }
+  };
+
+  const fetchEvents = async () => {
+    try {
+      const fetchedEvents = await getAllEvents(token);
+      setEvents(fetchedEvents);
+    } catch (error) {
+      console.error("Error fetching events:", error);
+    }
+  };
 
   // Toggle user block status
   const toggleBlockUser = async (email) => {
@@ -61,6 +65,7 @@ const UserManagementDashboard = () => {
       console.error("Error updating user block status:", error);
     }
   };
+
   const openEditModal = (event) => {
     setSelectedEvent(event);
     setIsEditModalOpen(true);
@@ -68,29 +73,25 @@ const UserManagementDashboard = () => {
 
   const handleSaveEvent = async (updatedEvent) => {
     try {
-      const editedEvent = await editEventService(
-        selectedEvent._id,
-        updatedEvent,
-        token
-      );
-      setEvents((prevEvents) =>
-        prevEvents.map((event) =>
-          event._id === selectedEvent._id ? { ...event, ...editedEvent } : event
-        )
-      );
+      await editEventService(selectedEvent._id, updatedEvent, token);
       setIsEditModalOpen(false);
+      fetchEvents(); // Reload events after editing
     } catch (error) {
       console.error("Error editing event:", error);
     }
   };
 
   // Delete event
-  const deleteEvent = async (eventId) => {
+  const deleteEvent = async (eventId, isRecurring, seriesId) => {
     try {
-      await deleteEventService(eventId, token);
-      setEvents((prevEvents) =>
-        prevEvents.filter((event) => event._id !== eventId)
-      );
+      if (isRecurring && seriesId) {
+        // Delete all events in the recurring series
+        await deleteRecurringEvents(seriesId, token);
+      } else {
+        // Delete a single event
+        await deleteEventService(eventId, token);
+      }
+      fetchEvents(); // Reload events after deleting
     } catch (error) {
       console.error("Error deleting event:", error);
     }
@@ -106,6 +107,7 @@ const UserManagementDashboard = () => {
           user.email.toLowerCase().includes(searchTerm.toLowerCase())
       )
     : [];
+
   const getUniqueEvents = (events) => {
     const uniqueEventsMap = new Map();
     events.forEach((event) => {
@@ -129,11 +131,9 @@ const UserManagementDashboard = () => {
     : [];
 
   // Pagination logic
-
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentEvents = filteredEvents.slice(indexOfFirstItem, indexOfLastItem);
-
   const currentUsers = filteredUsers.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(
     activeTab === "users"
@@ -313,7 +313,6 @@ const UserManagementDashboard = () => {
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                             {event.isRecurring ? "Yes" : "No"}
                           </td>
-
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                             {event.location}
                           </td>
@@ -335,7 +334,13 @@ const UserManagementDashboard = () => {
                               />
                             )}
                             <button
-                              onClick={() => deleteEvent(event._id)}
+                              onClick={() =>
+                                deleteEvent(
+                                  event._id,
+                                  event.isRecurring,
+                                  event.seriesId
+                                )
+                              }
                               className="p-1 bg-red-100 text-red-600 rounded"
                               title="Delete"
                             >
