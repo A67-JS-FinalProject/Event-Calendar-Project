@@ -1,29 +1,79 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import PropTypes from "prop-types";
+import {
+  getEventById,
+  getEvents,
+  editEvent,
+} from "../../services/eventService"; // Import necessary services
 
-const EditEventModal = ({ event, onClose, onSave }) => {
-  const [formData, setFormData] = useState({
-    title: event?.title || "",
-    startDate: event?.startDate || "",
-    endDate: event?.endDate || "",
-    location: event?.location || "",
-    description: event?.description || "",
-    isPublic: event?.isPublic || false,
-  });
+const EditEventModal = ({ eventId, onClose, onSave }) => {
+  const [formData, setFormData] = useState(null);
+  const [originalData, setOriginalData] = useState(null);
+  const [allEvents, setAllEvents] = useState([]);
 
-  const handleSubmit = (e) => {
+  useEffect(() => {
+    if (!eventId) return;
+
+    const fetchEventData = async () => {
+      try {
+        const eventData = await getEventById(eventId);
+        setFormData(eventData);
+        setOriginalData(eventData);
+
+        const events = await getEvents(); // Fetch all events
+        setAllEvents(events);
+      } catch (error) {
+        console.error("Error fetching event data:", error);
+      }
+    };
+
+    fetchEventData();
+  }, [eventId]);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    onSave(formData);
+
+    try {
+      // Find all events with the same title, description, and location
+      const matchingEvents = allEvents.filter(
+        (event) =>
+          event.title === originalData.title &&
+          event.description === originalData.description &&
+          event.location === originalData.location
+      );
+
+      if (matchingEvents.length > 0) {
+        // Update all matching events in the database
+        for (const event of matchingEvents) {
+          await editEvent(event._id, formData); // Update each matching event
+        }
+
+        console.log(`Updated ${matchingEvents.length} events successfully.`);
+        onSave(formData); // Notify parent component about the changes
+      } else {
+        console.log("No matching events found to update.");
+      }
+    } catch (error) {
+      console.error("Error updating events:", error);
+    }
   };
 
+  if (!formData) {
+    return <p>Loading...</p>;
+  }
+
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+    <div className="fixed inset-0 flex items-center justify-center">
       <div className="bg-white p-6 rounded-lg w-96">
         <h2 className="text-xl font-bold mb-4">Edit Event</h2>
         <form onSubmit={handleSubmit}>
+          {/* Title Input */}
           <div className="mb-4">
-            <label className="block mb-1">Title</label>
+            <label htmlFor="title" className="block mb-1">
+              Title
+            </label>
             <input
+              id="title"
               type="text"
               value={formData.title}
               onChange={(e) =>
@@ -32,7 +82,52 @@ const EditEventModal = ({ event, onClose, onSave }) => {
               className="w-full p-2 border rounded"
             />
           </div>
-          {/* Add other form fields similarly */}
+
+          {/* Location Input */}
+          <div className="mb-4">
+            <label htmlFor="location" className="block mb-1">
+              Location
+            </label>
+            <input
+              id="location"
+              type="text"
+              value={formData.location}
+              onChange={(e) =>
+                setFormData({ ...formData, location: e.target.value })
+              }
+              className="w-full p-2 border rounded"
+            />
+          </div>
+
+          {/* Description Input */}
+          <div className="mb-4">
+            <label htmlFor="description" className="block mb-1">
+              Description
+            </label>
+            <textarea
+              id="description"
+              value={formData.description}
+              onChange={(e) =>
+                setFormData({ ...formData, description: e.target.value })
+              }
+              className="w-full p-2 border rounded"
+            />
+          </div>
+
+          {/* Is Public Checkbox */}
+          <div className="mb-4 flex items-center">
+            <input
+              id="isPublic"
+              type="checkbox"
+              checked={formData.isPublic}
+              onChange={(e) =>
+                setFormData({ ...formData, isPublic: e.target.checked })
+              }
+              className="mr-2"
+            />
+            <label htmlFor="isPublic">Public Event</label>
+          </div>
+          {/* Buttons */}
           <div className="flex justify-end gap-2">
             <button
               type="button"
@@ -55,7 +150,7 @@ const EditEventModal = ({ event, onClose, onSave }) => {
 };
 
 EditEventModal.propTypes = {
-  event: PropTypes.object,
+  eventId: PropTypes.string.isRequired,
   onClose: PropTypes.func.isRequired,
   onSave: PropTypes.func.isRequired,
 };

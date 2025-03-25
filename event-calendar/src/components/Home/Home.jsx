@@ -1,7 +1,6 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import React from "react";
 import { useNavigate } from "react-router-dom";
-
 import { FaChevronLeft } from "react-icons/fa";
 import { FaChevronRight } from "react-icons/fa";
 import { RxHamburgerMenu } from "react-icons/rx";
@@ -10,22 +9,41 @@ import { FaRegCalendarAlt } from "react-icons/fa";
 import { LuListTodo } from "react-icons/lu";
 import { FaPlus } from "react-icons/fa";
 import CreateAnEvent from "../CreateAEvent/CreateAnEvent";
-
+import { AppContext } from "../../store/app.context";
+import { getUserByEmail } from "../../services/usersService";
 import logo from "../../assets/logo.png";
 
 const Home = () => {
+  const { appState } = useContext(AppContext);
+
   const navigate = useNavigate();
   const [view, setView] = useState("Year");
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [isOpen, setIsOpen] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [profilePictureURL, setProfilePictureURL] = useState("");
 
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
+
   useEffect(() => {
     document.title = "Event Calendar";
     fetch("/api/events");
-  }, []);
+    const fetchUserProfile = async () => {
+      if (appState?.user && appState?.token) {
+        try {
+          const userData = await getUserByEmail(appState.user, appState.token);
+          if (userData?.profilePictureURL) {
+            setProfilePictureURL(userData.profilePictureURL);
+          }
+        } catch (error) {
+          console.error("Error fetching user profile:", error);
+        }
+      }
+    };
+
+    fetchUserProfile();
+  }, [appState]);
 
   const changeMonth = (offset) => {
     setSelectedDate(
@@ -342,7 +360,7 @@ const Home = () => {
               ))}
             </ul>
           </details>
-          <a href="/admin">dasddsa</a>
+          <a href="/admin">ADMIN PANEL</a>
           {/* Calendar & To-Do Icons */}
           <div className="flex items-center border-2 divide-x rounded-full px-4 py-2">
             <div className="p-2">
@@ -356,7 +374,19 @@ const Home = () => {
           {/* Profile Dropdown */}
           <details className="dropdown">
             <summary className="btn btn-ghost rounded-full">
-              <img src=" " alt="" /> <GoTriangleDown />
+              <div className="avatar">
+                <div className="w-12 rounded-full">
+                  {profilePictureURL ? (
+                    <img src={profilePictureURL} alt="User Profile" />
+                  ) : (
+                    <div className="bg-gray-400 w-full h-full flex items-center justify-center text-white">
+                      {/* Placeholder for missing profile picture */}
+                      <span className="text-sm">No Image</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+              <GoTriangleDown />{" "}
             </summary>
             <ul className="menu dropdown-content bg-base-100 rounded-box shadow-lg z-10 w-52 p-2">
               <li>

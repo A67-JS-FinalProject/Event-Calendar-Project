@@ -1,21 +1,29 @@
 import axios from "axios";
 
 const URL = `http://localhost:3000`;
-
 export const getAllEvents = async (token) => {
   try {
-    const response = await axios.get(`${URL}/events`, {
+    console.log("Fetching events from:", `${URL}/events`);
+    const response = await fetch(`${URL}/events`, {
+      method: "GET",
       headers: {
+        "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
     });
-    return response.data;
+
+    if (response.ok) {
+      const data = await response.json();
+      return data;
+    } else {
+      console.error("Error fetching events:", response.statusText);
+      return [];
+    }
   } catch (error) {
-    console.error("Error fetching events:", error);
+    console.error("Error fetching events:", error.message);
     return [];
   }
 };
-
 export const createEvent = async (event, token) => {
   try {
     const response = await fetch(`${URL}/events`, {
