@@ -42,11 +42,11 @@ function CreateContactList({ isOpen, onRequestClose }) {
                 const lists = await getContactLists(authUser.email);
                 const listNames = lists.map(list => list.name);
 
-            if (listNames.includes(contactListName)) {
-                alert("List name already exists. Please choose a different name.");
-                return;
-            }
-            
+                if (listNames.includes(contactListName)) {
+                    alert("List name already exists. Please choose a different name.");
+                    return;
+                }
+
                 await updateUserContactLists(authUser.email, contactListName, participants);
                 console.log("Contact List created successfully.");
                 setContactListName('');
@@ -101,7 +101,7 @@ function CreateContactList({ isOpen, onRequestClose }) {
                         </svg>
                         <input
                             type="search"
-                            placeholder="Search by name, user, email, phone"
+                            placeholder="Search by name, username, email, phone"
                             value={searchQuery}
                             onChange={async (e) => {
                                 const query = e.target.value.toLowerCase();
@@ -129,7 +129,6 @@ function CreateContactList({ isOpen, onRequestClose }) {
                     </label>
                     <ul className="mt-2">
                         {searchResults.map((user, index) => {
-                            // Determine what matched the search query
                             let matchedField = '';
                             if (user.phoneNumber && user.phoneNumber.includes(searchQuery)) {
                                 matchedField = user.phoneNumber;

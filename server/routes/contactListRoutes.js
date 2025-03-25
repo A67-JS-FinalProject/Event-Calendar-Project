@@ -106,4 +106,24 @@ contactListRoutes.route("/users/:email/contactLists/:listName").put(async (req, 
   }
 });
 
+// Get users inside a contact list
+contactListRoutes.route("/users/:email/contactLists/:listName").get(async (req, res) => {
+  try {
+    const db = connectObject.getDb();
+    const user = await db.collection("users").findOne(
+      { email: req.params.email, "contactLists.name": req.params.listName },
+      { projection: { "contactLists.$": 1 } }
+    );
+
+    if (!user) {
+      return res.status(404).json({ message: "User or contact list not found" });
+    }
+
+    console.log("User Data:", user); // Add this log
+    res.json({ users: user.contactLists[0].users });
+  } catch (error) {
+    console.error("Error fetching contact list participants:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
 export default contactListRoutes;

@@ -80,7 +80,7 @@ function App() {
           <Route
             path="/home/contact-lists/:listName"
             element={
-                <SingleContactView/>
+                <Authenticated><SingleContactView/></Authenticated>
             }
           />
           <Route path="*" element={<NotFound />} />

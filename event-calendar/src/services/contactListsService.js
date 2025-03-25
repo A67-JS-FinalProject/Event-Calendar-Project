@@ -55,3 +55,22 @@ export const deleteContactList = async (email, listName) => {
     throw error;
   }
 };
+
+export const getContactListParticipants = async (email, listName) => {
+
+  try {
+    const response = await fetch(`${URL}/users/${email}/contactLists/${listName}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    const data = await response.json();
+    console.log(data);
+    return data;
+  } catch (error) {
+    console.error("Error fetching contact list participants:", error);
+    throw error;
+  }
+};
