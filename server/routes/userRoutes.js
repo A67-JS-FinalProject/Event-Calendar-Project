@@ -50,6 +50,7 @@ userRoutes.route("/users").post(async (req, res) => {
         "https://res.cloudinary.com/dglknhf3r/image/upload/v1741793969/default-profile-account-unknown-icon-black-silhouette-free-vector_nluuwb.jpg",
       isAdmin: false,
       contactLists: [],
+      isBlocked: false,
     };
     let result = await db.collection("users").insertOne(newUser);
     console.log("Inserted user:", newUser); // Add logging

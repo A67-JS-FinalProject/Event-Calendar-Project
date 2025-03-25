@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { getContactListParticipants } from "../../services/contactListsService";
 import { auth } from "../../config/firebaseConfig";
 import { getUserByEmail } from "../../services/usersService";
+import { deleteSingleContact } from "../../services/contactListsService";
 
 function SingleContactView() {
     const { listName } = useParams();
@@ -67,6 +68,16 @@ function SingleContactView() {
         fetchParticipants();
     }, [listName, authUser]);
 
+    const handleDelete = async (contactEmail) => {
+        try {   
+            const token = await auth.currentUser.getIdToken();
+            await deleteSingleContact(authUser.email, listName, contactEmail, token);
+            setParticipants((prev) => prev.filter((item) => item !== contactEmail));
+        } catch (error) {
+            console.error("Error deleting contact:", error);
+        }
+    };
+
     if (loading) {
         return (
             <div className="flex justify-center items-center h-screen">
@@ -108,7 +119,10 @@ function SingleContactView() {
                                 <p className="text-gray-600">{email} (email)</p>
                                 <p className="text-gray-600">{userDetails[email]?.phoneNumber} (phone)</p>
 
-                                <button className="btn btn-error">Delete Contact</button>
+                                <button className="btn btn-error" onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleDelete(email);
+                                }}>Delete Contact</button>
                             </div>
                         </div>
                     ))

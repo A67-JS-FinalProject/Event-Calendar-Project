@@ -127,3 +127,26 @@ contactListRoutes.route("/users/:email/contactLists/:listName").get(async (req, 
   }
 });
 export default contactListRoutes;
+
+// delete user from contact list
+contactListRoutes.route("/users/:email/contactLists/:listName/:contactEmail").delete(async (req, res) => {
+  try {
+    const db = connectObject.getDb();
+    const result = await db.collection("users").updateOne(
+      { email: req.params.email, "contactLists.name": req.params.listName },
+      { $pull: { "contactLists.$.users": req.params.contactEmail } }
+    );
+
+    if (result.matchedCount === 0) {
+      return res.status(404).json({ message: "User or contact list not found" });
+    }
+    if (result.modifiedCount === 0) {
+      return res.status(404).json({ message: "Contact not found in list" });
+    }
+
+    res.json({ message: "Contact deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting contact:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
