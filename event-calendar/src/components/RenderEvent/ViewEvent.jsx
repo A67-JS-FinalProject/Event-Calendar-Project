@@ -1,42 +1,41 @@
 import { useEffect, useState, useContext } from "react";
 import { useParams } from "react-router-dom";
 import { getEventById } from "../../services/eventService";
+import { getUserByEmail } from "../../services/usersService";
 import { CiCalendar } from "react-icons/ci";
 import { FaClock } from "react-icons/fa6";
-import { getUserByEmail } from "../../services/usersService";
 import { AppContext } from "../../store/app.context";
 
 function RenderEvent() {
   const { id } = useParams();
   const { appState } = useContext(AppContext);
-  const { user, token } = appState;
-  const [EventData, setEventData] = useState(null);
+  const [data, setData] = useState(null);
   const [userData, setUserData] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
       const eventInfo = await getEventById(id);
-      const userInfo = await getUserByEmail(user, token);
-      setEventData(eventInfo);
+      const userInfo = await getUserByEmail(appState.user, appState.token);
+      setData(eventInfo);
       setUserData(userInfo);
     };
 
     fetchData();
-  }, [id, user, token]);
+  }, [id, appState.user, appState.token]);
 
-  if (!EventData) {
+  if (!data) {
     return <div>Loading...</div>;
   }
   const isOrganizer = data?.organizer === appState.user;
 
   console.log("Cover Photo URL:", data.eventCover); // Log the URL to the console
 
-  const handleUpdateParticipants = (updatedParticipants) => {
-    setData((prevData) => ({
-      ...prevData,
-      participants: updatedParticipants,
-    }));
-  };
+  // const handleUpdateParticipants = (updatedParticipants) => {
+  //   setData((prevData) => ({
+  //     ...prevData,
+  //     participants: updatedParticipants,
+  //   }));
+  // };
 
   return (
     <>
@@ -46,7 +45,7 @@ function RenderEvent() {
           <div
             className="absolute inset-0 w-full h-full bg-cover bg-center"
             style={{
-              backgroundImage: `url(${EventData.eventCover})`,
+              backgroundImage: `url(${data.eventCover})`,
               backgroundSize: "cover",
               backgroundPosition: "center",
             }}
@@ -56,18 +55,18 @@ function RenderEvent() {
 
           <div className="relative z-10 flex flex-col items-center justify-center h-full p-10 text-white">
             <p className="font-semibold text-xl mb-10">
-              {new Date(EventData.startDate).toLocaleDateString("en-GB", {
+              {new Date(data.startDate).toLocaleDateString("en-GB", {
                 month: "long",
                 day: "numeric",
                 year: "numeric",
               })}
             </p>
 
-            <h2 className="font-semibold text-3xl mb-10">{EventData.title}</h2>
+            <h2 className="font-semibold text-3xl mb-10">{data.title}</h2>
             <div className="flex flex-row items-center">
               <p>By: </p>
               <p className="text-md text-white underline decoration-dotted ml-2">
-                {EventData.createdBy.firstName} {EventData.createdBy.lastName}
+                {data.createdBy.firstName} {data.createdBy.lastName}
               </p>
             </div>
           </div>
@@ -80,7 +79,7 @@ function RenderEvent() {
               <div className="flex flex-row items-center mb-4">
                 <CiCalendar className="text-pink-500 mr-2" />
                 <p className="text-black">
-                  {new Date(EventData.startDate).toLocaleDateString("en-GB", {
+                  {new Date(data.startDate).toLocaleDateString("en-GB", {
                     weekday: "short",
                     month: "long",
                     day: "numeric",
@@ -91,12 +90,12 @@ function RenderEvent() {
               <div className="flex flex-row items-center mb-4  ">
                 <FaClock className="text-pink-500 mr-2" />
                 <p className="text-black">
-                  {new Date(EventData.startDate).toLocaleTimeString("en-GB", {
+                  {new Date(data.startDate).toLocaleTimeString("en-GB", {
                     hour: "2-digit",
                     minute: "2-digit",
                   })}
                   -{" "}
-                  {new Date(EventData.endDate).toLocaleTimeString("en-GB", {
+                  {new Date(data.endDate).toLocaleTimeString("en-GB", {
                     hour: "2-digit",
                     minute: "2-digit",
                   })}
@@ -114,7 +113,7 @@ function RenderEvent() {
                 Event Overview
               </h1>
               <br />
-              <p className="text-black">{EventData.description}</p>
+              <p className="text-black">{data.description}</p>
             </div>
             <div className="mt-4   ">
               <div>
@@ -124,45 +123,30 @@ function RenderEvent() {
                   className=" w-30 h-30"
                 />
               </div>
-              <p className="text-black">Location: {EventData.location}</p>
+              <p className="text-black">Location: {data.location}</p>
               <p className="text-black">
-                Participants: {EventData.participants.join(", ")}
+                Participants: {data.participants.join(", ")}
               </p>
               <p className="text-black">
-                Public: {EventData.isPublic ? "Yes" : "No"}
+                Public: {data.isPublic ? "Yes" : "No"}
               </p>
               <p className="text-black">
-                Recurring: {EventData.isRecurring ? "Yes" : "No"}
+                Recurring: {data.isRecurring ? "Yes" : "No"}
               </p>
-              <p className="text-black">Tags: {EventData.tags.join("# ")}</p>
+              <p className="text-black">Tags: {data.tags.join("# ")}</p>
               <p className="text-black">
-                Reminders: {EventData.reminders.join("# ")}
+                Reminders: {data.reminders.join("# ")}
               </p>
             </div>
           </div>
-          <h1 className="text-black text-4xl   font-semibold">
-            Event Overview
-          </h1>
-          <br />
-          <p className="text-black">{data.description}</p>
-          <p className="text-black">Location: {data.location}</p>
-          <p className="text-black">
-            Participants: {data.participants.map((p) => p.email).join(", ")}
-          </p>
-          {isOrganizer && (
+          {/* {isOrganizer && (
             <ManageParticipants
               eventId={id}
               participants={data.participants}
               onUpdate={handleUpdateParticipants}
               currentUserEmail={appState.user}
             />
-          )}
-          <p className="text-black">Public: {data.isPublic ? "Yes" : "No"}</p>
-          <p className="text-black">
-            Recurring: {data.isRecurring ? "Yes" : "No"}
-          </p>
-          <p className="text-black">Tags: {data.tags.join("# ")}</p>
-          <p className="text-black">Reminders: {data.reminders.join("# ")}</p>
+          )} */}
         </div>
       </div>
     </>

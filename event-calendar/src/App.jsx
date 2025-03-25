@@ -72,11 +72,12 @@ function App() {
               </Authenticated>
             }
           />
-          <Route path="/admin" element={<AdminDashboard />} />
           <Route
             path="/home/contact-lists/:listName"
             element={
-                <Authenticated><SingleContactView/></Authenticated>
+              <Authenticated>
+                <SingleContactView />
+              </Authenticated>
             }
           />
           <Route path="/admin" element={<AdminDashboard />} />

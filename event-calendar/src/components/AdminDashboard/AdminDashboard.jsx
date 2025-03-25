@@ -106,20 +106,35 @@ const UserManagementDashboard = () => {
           user.email.toLowerCase().includes(searchTerm.toLowerCase())
       )
     : [];
+  const getUniqueEvents = (events) => {
+    const uniqueEventsMap = new Map();
+    events.forEach((event) => {
+      const key = `${event.title}-${event.description}-${event.location}`;
+      if (!uniqueEventsMap.has(key)) {
+        uniqueEventsMap.set(key, event);
+      }
+    });
+    return Array.from(uniqueEventsMap.values());
+  };
 
+  // Filter data based on search term and remove duplicates
   const filteredEvents = Array.isArray(events)
-    ? events.filter(
-        (event) =>
-          event.title &&
-          event.title.toLowerCase().includes(searchTerm.toLowerCase())
+    ? getUniqueEvents(
+        events.filter(
+          (event) =>
+            event.title &&
+            event.title.toLowerCase().includes(searchTerm.toLowerCase())
+        )
       )
     : [];
 
   // Pagination logic
+
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentUsers = filteredUsers.slice(indexOfFirstItem, indexOfLastItem);
   const currentEvents = filteredEvents.slice(indexOfFirstItem, indexOfLastItem);
+
+  const currentUsers = filteredUsers.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(
     activeTab === "users"
       ? filteredUsers.length / itemsPerPage
@@ -278,7 +293,7 @@ const UserManagementDashboard = () => {
                         Event Name
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Date
+                        Recurring
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Location
@@ -296,8 +311,9 @@ const UserManagementDashboard = () => {
                             {event.title}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            {event.startDate}
+                            {event.isRecurring ? "Yes" : "No"}
                           </td>
+
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                             {event.location}
                           </td>
@@ -309,6 +325,15 @@ const UserManagementDashboard = () => {
                             >
                               <MdModeEdit className="h-5 w-5" />
                             </button>
+                            {isEditModalOpen && (
+                              <EditEventModal
+                                eventId={
+                                  selectedEvent ? selectedEvent._id : null
+                                }
+                                onClose={() => setIsEditModalOpen(false)}
+                                onSave={handleSaveEvent}
+                              />
+                            )}
                             <button
                               onClick={() => deleteEvent(event._id)}
                               className="p-1 bg-red-100 text-red-600 rounded"
@@ -369,13 +394,6 @@ const UserManagementDashboard = () => {
           )}
         </div>
       </div>
-      {isEditModalOpen && (
-        <EditEventModal
-          event={selectedEvent}
-          onClose={() => setIsEditModalOpen(false)}
-          onSave={handleSaveEvent}
-        />
-      )}
     </div>
   );
 };
