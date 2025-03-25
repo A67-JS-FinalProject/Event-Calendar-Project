@@ -153,13 +153,45 @@ EventRoutes.route("/events/:id").put(async (req, res) => {
 EventRoutes.route("/events/:id").delete(async (req, res) => {
   const db = database.getDb();
   try {
-    const result = await db
+    // Find the event to check if it's recurring
+    const event = await db
       .collection("events")
-      .deleteOne({ _id: new ObjectId(req.params.id) });
-    if (result.deletedCount > 0) {
-      res.status(200).json({ message: "Event deleted successfully" });
+      .findOne({ _id: new ObjectId(req.params.id) });
+
+    if (!event) {
+      return res.status(404).json({ error: "Event not found" });
+    }
+
+    if (event.isRecurring) {
+      // Delete all recurring events with the same recurrenceType and recurrenceEndDate
+      const result = await db.collection("events").deleteMany({
+        isRecurring: true,
+        recurrenceType: event.recurrenceType,
+        recurrenceEndDate: event.recurrenceEndDate,
+      });
+
+      if (result.deletedCount > 0) {
+        return res
+          .status(200)
+          .json({
+            message: `${result.deletedCount} recurring events deleted successfully`,
+          });
+      } else {
+        return res
+          .status(404)
+          .json({ error: "No recurring events found to delete" });
+      }
     } else {
-      res.status(404).json({ error: "Event not found" });
+      // Delete a single event if it's not recurring
+      const result = await db
+        .collection("events")
+        .deleteOne({ _id: new ObjectId(req.params.id) });
+
+      if (result.deletedCount > 0) {
+        return res.status(200).json({ message: "Event deleted successfully" });
+      } else {
+        return res.status(404).json({ error: "Event not found" });
+      }
     }
   } catch (error) {
     res.status(500).json({ error: error.message });

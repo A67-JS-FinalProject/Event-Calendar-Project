@@ -76,17 +76,20 @@ export const updateEvent = async (id, event) => {
   }
 };
 
-export const deleteEventsId = async (id) => {
+export const deleteRecurringEvents = async (seriesId, token) => {
   try {
-    const response = await fetch(`${URL}/events/${id}`, {
-      method: "DELETE",
+    const response = await axios.delete(`${URL}/events/recurring/${seriesId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     });
-    const data = await response.json();
-    return data;
+    return response.data;
   } catch (error) {
-    console.error("Error fetching data:", error);
+    console.error("Error deleting recurring events:", error);
+    throw error;
   }
 };
+
 export const editEvent = async (id, event, token) => {
   try {
     const response = await fetch(`${URL}/events/${id}`, {
@@ -105,16 +108,14 @@ export const editEvent = async (id, event, token) => {
   }
 };
 
-export const deleteEvent = async (id, token) => {
+export const deleteEvent = async (eventId, token) => {
   try {
-    const response = await fetch(`${URL}/events/${id}`, {
-      method: "DELETE",
+    const response = await axios.delete(`${URL}/events/${eventId}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
-    const data = await response.json();
-    return data;
+    return response.data;
   } catch (error) {
     console.error("Error deleting event:", error);
     throw error;
