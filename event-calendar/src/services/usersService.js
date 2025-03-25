@@ -1,3 +1,4 @@
+import axios from "axios";
 const URL = `http://localhost:3000`;
 /* Users collection */
 export const getUserByEmail = async (email, token) => {
@@ -72,5 +73,28 @@ export const updateUserEvent = async (email, eventIds) => {
     return data;
   } catch (error) {
     console.error("Error updating user events:", error);
+  }
+};
+export const getAllUsers = async (token) => {
+  try {
+    const response = await fetch(`${URL}/users`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    const users = await response.json();
+    return users;
+  } catch (error) {
+    console.error("Error fetching users:", error);
+  }
+};
+export const toggleBlockUser = async (email) => {
+  try {
+    const response = await axios.put(`${URL}/users/${email}/block`);
+    return response.data;
+  } catch (error) {
+    console.error("Error updating user block status:", error);
+    throw error;
   }
 };

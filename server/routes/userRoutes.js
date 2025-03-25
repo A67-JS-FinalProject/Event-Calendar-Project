@@ -1,7 +1,6 @@
 import express from "express";
 import connectObject from "../connect.js";
 import { ObjectId } from "mongodb";
-
 let userRoutes = express.Router();
 
 // Retrieve All Users
@@ -101,9 +100,6 @@ userRoutes.route("/users/:id").delete(async (req, res) => {
     res.status(400).json("Error: " + err);
   }
 });
-
-export default userRoutes;
-
 // upload the event id  to user
 userRoutes.route("/users/:email/events").put(async (req, res) => {
   try {
@@ -140,3 +136,23 @@ userRoutes.route("/users/:email/events").put(async (req, res) => {
     res.status(400).json({ error: err.message });
   }
 });
+
+userRoutes.put("/users/:email/block", async (req, res) => {
+  const { email } = req.params;
+  try {
+    let db = connectObject.getDb();
+    const user = await db.collection("users").findOne({ email });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    const updatedUser = await db
+      .collection("users")
+      .updateOne({ email }, { $set: { isBlocked: !user.isBlocked } });
+    console.log("Updated user block status:", updatedUser);
+    res.json({ message: "User block status updated successfully" });
+  } catch (error) {
+    console.error("Error updating user block status:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+export default userRoutes;

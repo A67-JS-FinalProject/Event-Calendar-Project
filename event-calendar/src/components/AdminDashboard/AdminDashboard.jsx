@@ -1,218 +1,383 @@
-import { useContext, useState, useEffect } from 'react';
-import { AppContext } from '../../store/app.context';
-import PersonalCalendar from '../Dashboard/PersonalCalendar'; // Fixed import path
-import EventManager from '../Dashboard/EventManager'; // Fixed import path
-import EventInvitationsList from '../Events/EventInvitationsList';
-import { FaCog, FaCalendarAlt, FaSignOutAlt, FaSearch, FaEdit, FaTrash, FaUsers } from 'react-icons/fa';
-import { useNavigate } from 'react-router-dom';
-import { logout } from '../../services/authenticationService';
+import { useState, useContext, useEffect } from "react";
+import {
+  MdSearch,
+  MdModeEdit,
+  MdDeleteForever,
+  MdLockOpen,
+  MdOutlineLock,
+} from "react-icons/md";
+import EditEventModal from "./EditEventModal";
+import { AppContext } from "../../store/app.context";
+import { getAllUsers } from "../../services/usersService";
+import { getAllEvents } from "../../services/eventService";
+import { toggleBlockUser as toggleBlockUserService } from "../../services/usersService";
+import {
+  editEvent as editEventService,
+  deleteEvent as deleteEventService,
+} from "../../services/eventService";
 
-const AdminDashboard = () => {
-  const { appState } = useContext(AppContext);
-  const [activeSection, setActiveSection] = useState('calendar');
-  const [isLoading, setIsLoading] = useState(false);
-  const navigate = useNavigate();
+const UserManagementDashboard = () => {
+  const { token } = useContext(AppContext);
+
+  const [users, setUsers] = useState([]);
   const [events, setEvents] = useState([]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedStatus, setSelectedStatus] = useState('all');
+  const [activeTab, setActiveTab] = useState("users");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [selectedEvent, setSelectedEvent] = useState(null);
+  const itemsPerPage = 5;
 
-  const handleLogout = async () => {
-    try {
-      await logout();
-      setAppState({
-        user: null,
-        userData: null,
-        token: null,
-      });
-      navigate('/login');
-    } catch (error) {
-      console.error('Logout failed:', error);
-    }
-  };
+  useEffect(() => {
+    const fetchUsers = async () => {
+      const fetchedUsers = await getAllUsers(token);
+      setUsers(fetchedUsers);
+    };
 
-  const handleDeleteEvent = async (eventId) => {
-    if (!window.confirm('Are you sure you want to delete this event?')) return;
-    
-    try {
-      const response = await fetch(`http://localhost:3000/events/${eventId}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${appState.token}`
-        }
-      });
-      
-      if (response.ok) {
-        setEvents(events.filter(event => event._id !== eventId));
+    const fetchEvents = async () => {
+      try {
+        const fetchedEvents = await getAllEvents(token);
+        console.log("Fetched events:", fetchedEvents); // Debug log
+        setEvents(fetchedEvents);
+      } catch (error) {
+        console.error("Error fetching events:", error); // Error log
       }
+    };
+
+    fetchUsers();
+    fetchEvents();
+  }, [token]);
+
+  // Toggle user block status
+  const toggleBlockUser = async (email) => {
+    try {
+      await toggleBlockUserService(email);
+      setUsers((prevUsers) =>
+        prevUsers.map((user) =>
+          user.email === email ? { ...user, isBlocked: !user.isBlocked } : user
+        )
+      );
     } catch (error) {
-      console.error('Error deleting event:', error);
+      console.error("Error updating user block status:", error);
+    }
+  };
+  const openEditModal = (event) => {
+    setSelectedEvent(event);
+    setIsEditModalOpen(true);
+  };
+
+  const handleSaveEvent = async (updatedEvent) => {
+    try {
+      const editedEvent = await editEventService(
+        selectedEvent._id,
+        updatedEvent,
+        token
+      );
+      setEvents((prevEvents) =>
+        prevEvents.map((event) =>
+          event._id === selectedEvent._id ? { ...event, ...editedEvent } : event
+        )
+      );
+      setIsEditModalOpen(false);
+    } catch (error) {
+      console.error("Error editing event:", error);
     }
   };
 
-  const filteredEvents = events.filter(event => {
-    const matchesSearch = event.title.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = selectedStatus === 'all' || event.status === selectedStatus;
-    return matchesSearch && matchesStatus;
-  });
+  // Delete event
+  const deleteEvent = async (eventId) => {
+    try {
+      await deleteEventService(eventId, token);
+      setEvents((prevEvents) =>
+        prevEvents.filter((event) => event._id !== eventId)
+      );
+    } catch (error) {
+      console.error("Error deleting event:", error);
+    }
+  };
+
+  // Filter data based on search term
+  const filteredUsers = Array.isArray(users)
+    ? users.filter(
+        (user) =>
+          user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          user.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          user.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          user.email.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    : [];
+
+  const filteredEvents = Array.isArray(events)
+    ? events.filter(
+        (event) =>
+          event.title &&
+          event.title.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    : [];
+
+  // Pagination logic
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentUsers = filteredUsers.slice(indexOfFirstItem, indexOfLastItem);
+  const currentEvents = filteredEvents.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(
+    activeTab === "users"
+      ? filteredUsers.length / itemsPerPage
+      : filteredEvents.length / itemsPerPage
+  );
 
   return (
-    <div className="flex h-screen bg-gray-100 dark:bg-gray-900">
-      {/* Sidebar */}
-      <div className="w-64 bg-white shadow-lg dark:bg-gray-800">
-        <div className="p-6">
-          <h2 className="text-xl font-semibold text-gray-800 dark:text-white">
-            {appState.userData?.username}&apos;s Dashboard
-          </h2>
+    <div className="min-h-screen bg-gray-100 p-6">
+      <div className="max-w-6xl mx-auto bg-white rounded-lg shadow-md overflow-hidden">
+        {/* Header */}
+        <div className="bg-indigo-600 p-6 text-white">
+          <h1 className="text-2xl font-bold">Admin Dashboard</h1>
         </div>
-        <nav className="mt-6">
-          <button
-            className={`w-full flex items-center px-6 py-3 ${
-              activeSection === 'calendar' ? 'bg-blue-50 text-blue-600 dark:bg-blue-800 dark:text-blue-300' : 'text-gray-600 dark:text-gray-400'
-            }`}
-            onClick={() => setActiveSection('calendar')}
-          >
-            <FaCalendarAlt className="mr-3" />
-            Calendar
-          </button>
 
-          {/* Admin Dashboard button - visible only if user is admin */}
-          {appState.userData?.isAdmin && (
-            <button
-              className="w-full flex items-center px-6 py-3 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700"
-              onClick={() => navigate('/admin')}
-            >
-              <FaCog className="mr-3" />
-              Admin Dashboard
-            </button>
+        {/* Tabs */}
+        <div className="flex border-b">
+          <button
+            className={`px-6 py-3 font-medium ${
+              activeTab === "users"
+                ? "text-indigo-600 border-b-2 border-indigo-600"
+                : "text-gray-500"
+            }`}
+            onClick={() => setActiveTab("users")}
+          >
+            User Management
+          </button>
+          <button
+            className={`px-6 py-3 font-medium ${
+              activeTab === "events"
+                ? "text-indigo-600 border-b-2 border-indigo-600"
+                : "text-gray-500"
+            }`}
+            onClick={() => setActiveTab("events")}
+          >
+            Event Management
+          </button>
+        </div>
+
+        {/* Search Bar */}
+        <div className="p-6 border-b">
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <MdSearch className="h-5 w-5 text-gray-400" />
+            </div>
+            <input
+              type="text"
+              className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              placeholder={`Search ${
+                activeTab === "users"
+                  ? "users by username, name, or email"
+                  : "events by name"
+              }`}
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+        </div>
+
+        {/* Content */}
+        <div className="p-6">
+          {activeTab === "users" ? (
+            <div>
+              <h2 className="text-lg font-medium text-gray-900 mb-4">
+                User List
+              </h2>
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Username
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Name
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Email
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Status
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Actions
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {currentUsers.length > 0 ? (
+                      currentUsers.map((user, index) => (
+                        <tr key={`user-${user.email || index}`}>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                            {user.username}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {user.firstName} {user.lastName}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {user.email}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            <span
+                              className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                                user.isBlocked
+                                  ? "bg-red-100 text-red-800"
+                                  : "bg-green-100 text-green-800"
+                              }`}
+                            >
+                              {user.isBlocked ? "Blocked" : "Active"}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            <button
+                              onClick={() => toggleBlockUser(user.email)}
+                              className={`mr-2 p-1 rounded ${
+                                user.isBlocked
+                                  ? "bg-green-100 text-green-600"
+                                  : "bg-red-100 text-red-600"
+                              }`}
+                              title={
+                                user.isBlocked ? "Unblock User" : "Block User"
+                              }
+                            >
+                              {user.isBlocked ? (
+                                <MdOutlineLock className="h-5 w-5" />
+                              ) : (
+                                <MdLockOpen className="h-5 w-5" />
+                              )}
+                            </button>
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td
+                          colSpan="5"
+                          className="px-6 py-4 text-center text-sm text-gray-500"
+                        >
+                          No users found
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          ) : (
+            <div>
+              <h2 className="text-lg font-medium text-gray-900 mb-4">
+                Event List
+              </h2>
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Event Name
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Date
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Location
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Actions
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {currentEvents.length > 0 ? (
+                      currentEvents.map((event) => (
+                        <tr key={event._id}>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                            {event.title}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {event.startDate}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {event.location}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            <button
+                              className="mr-2 p-1 bg-blue-100 text-blue-600 rounded"
+                              title="Edit"
+                              onClick={() => openEditModal(event)}
+                            >
+                              <MdModeEdit className="h-5 w-5" />
+                            </button>
+                            <button
+                              onClick={() => deleteEvent(event._id)}
+                              className="p-1 bg-red-100 text-red-600 rounded"
+                              title="Delete"
+                            >
+                              <MdDeleteForever className="h-5 w-5" />
+                            </button>
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td
+                          colSpan="4"
+                          className="px-6 py-4 text-center text-sm text-gray-500"
+                        >
+                          No events found
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
           )}
 
-          <button
-            className={`w-full flex items-center px-6 py-3 ${
-              activeSection === 'settings' ? 'bg-blue-50 text-blue-600 dark:bg-blue-800 dark:text-blue-300' : 'text-gray-600 dark:text-gray-400'
-            }`}
-            onClick={() => setActiveSection('settings')}
-          >
-            <FaCog className="mr-3" />
-            Settings
-          </button>
-
-          <button
-            className="w-full flex items-center px-6 py-3 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700"
-            onClick={handleLogout}
-          >
-            <FaSignOutAlt className="mr-3" />
-            Logout
-          </button>
-        </nav>
-      </div>
-
-      {/* Main Content */}
-      <div className="flex-1 p-8">
-        <header className="flex justify-between items-center mb-8">
-          <h1 className="text-2xl font-bold text-gray-800 dark:text-white">
-            {activeSection === 'calendar' ? 'My Calendar' : 'Admin Event Management'}
-          </h1>
-        </header>
-
-        {activeSection === 'calendar' ? (
-          // ...existing calendar view code...
-          <>
-            <div className="col-span-2">
-              <PersonalCalendar />
-            </div>
-            <div className="col-span-1">
-              <EventManager />
-              <EventInvitationsList />
-            </div>
-          </>
-        ) : (
-          <div className="bg-white rounded-lg shadow p-6 dark:bg-gray-800">
-            {/* Search and Filter Section */}
-            <div className="flex gap-4 mb-6">
-              <div className="flex-1 relative">
-                <FaSearch className="absolute left-3 top-3 text-gray-400" />
-                <input
-                  type="text"
-                  placeholder="Search events..."
-                  className="w-full pl-10 pr-4 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-              </div>
-              <select
-                className="border rounded-lg px-4 py-2 dark:bg-gray-700 dark:border-gray-600"
-                value={selectedStatus}
-                onChange={(e) => setSelectedStatus(e.target.value)}
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-between mt-4">
+              <button
+                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+                className={`px-4 py-2 rounded-md ${
+                  currentPage === 1
+                    ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+                    : "bg-indigo-600 text-white hover:bg-indigo-700"
+                }`}
               >
-                <option value="all">All Events</option>
-                <option value="upcoming">Upcoming</option>
-                <option value="past">Past</option>
-                <option value="cancelled">Cancelled</option>
-              </select>
+                Previous
+              </button>
+              <span className="text-sm text-gray-700">
+                Page {currentPage} of {totalPages}
+              </span>
+              <button
+                onClick={() =>
+                  setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                }
+                disabled={currentPage === totalPages}
+                className={`px-4 py-2 rounded-md ${
+                  currentPage === totalPages
+                    ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+                    : "bg-indigo-600 text-white hover:bg-indigo-700"
+                }`}
+              >
+                Next
+              </button>
             </div>
-
-            {/* Events Table */}
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                <thead className="bg-gray-50 dark:bg-gray-700">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
-                      Event Title
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
-                      Date
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
-                      Organizer
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
-                  {filteredEvents.map((event) => (
-                    <tr key={event._id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        {event.title}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        {new Date(event.startDate).toLocaleDateString()}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        {event.createdBy.email}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex gap-3">
-                          <button
-                            onClick={() => navigate(`/events/${event._id}/edit`)}
-                            className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
-                            title="Edit event"
-                          >
-                            <FaEdit />
-                          </button>
-                          <button
-                            onClick={() => handleDeleteEvent(event._id)}
-                            className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
-                            title="Delete event"
-                          >
-                            <FaTrash />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        )}
-        {activeSection === 'calendar' && !isLoading && (
-          <div className="col-span-3 text-center">No events found</div>
-        )}
+          )}
+        </div>
       </div>
+      {isEditModalOpen && (
+        <EditEventModal
+          event={selectedEvent}
+          onClose={() => setIsEditModalOpen(false)}
+          onSave={handleSaveEvent}
+        />
+      )}
     </div>
   );
 };
 
-export default AdminDashboard;
+export default UserManagementDashboard;
