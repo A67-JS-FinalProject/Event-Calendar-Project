@@ -92,7 +92,7 @@ contactListRoutes.route("/users/:email/contactLists/:listName").put(async (req, 
 
     const result = await db.collection("users").updateOne(
       { email: req.params.email, "contactLists.name": req.params.listName },
-      { $set: { "contactLists.$.users": users } }
+      { $addToSet: { "contactLists.$.users": { $each: users } } }
     );
 
     if (result.matchedCount === 0) {
