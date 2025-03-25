@@ -37,9 +37,10 @@ export default function NavBarPublic() {
         const results = events
             .filter(event => event.title.toLowerCase().includes(search.toLowerCase()))
             .filter(event => event.startDate && new Date(event.startDate) >= currentDate)
-            .filter(event => event.isPublic === true);
+            .filter(event => event.isPublic === true)
+            .find(event => event.isRecurring === true); 
     
-        setFilteredEvents(results);
+            setFilteredEvents(results ? [results] : []);
         console.log("Search Results:", results);
     }, [search, events]);
 
