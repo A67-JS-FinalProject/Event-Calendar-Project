@@ -360,7 +360,15 @@ const Home = () => {
               ))}
             </ul>
           </details>
-          <a href="/admin">ADMIN PANEL</a>
+          {appState.userData?.isAdmin && (
+            <li>
+              {" "}
+              <a href="/admin-dashboard" className="text-indigo-600">
+                {" "}
+                Admin Dashboard{" "}
+              </a>{" "}
+            </li>
+          )}
           {/* Calendar & To-Do Icons */}
           <div className="flex items-center border-2 divide-x rounded-full px-4 py-2">
             <div className="p-2">
@@ -370,7 +378,6 @@ const Home = () => {
               <LuListTodo className="ml-2" />
             </div>
           </div>
-
           {/* Profile Dropdown */}
           <details className="dropdown">
             <summary className="btn btn-ghost rounded-full">

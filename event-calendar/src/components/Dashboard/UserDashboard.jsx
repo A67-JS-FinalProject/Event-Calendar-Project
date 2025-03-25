@@ -1,15 +1,15 @@
-import { useContext, useState } from 'react';
-import { AppContext } from '../../store/app.context';
-import PersonalCalendar from './PersonalCalendar';
-import EventManager from './EventManager';
-import EventInvitationsList from '../Events/EventInvitationsList';
-import { FaCog, FaBell, FaCalendarAlt, FaSignOutAlt } from 'react-icons/fa';
-import { useNavigate } from 'react-router-dom';
-import { logout } from '../../services/authenticationService';
+import { useContext, useState } from "react";
+import { AppContext } from "../../store/app.context";
+import PersonalCalendar from "./PersonalCalendar";
+import EventManager from "./EventManager";
+import EventInvitationsList from "../Events/EventInvitationsList";
+import { FaCog, FaBell, FaCalendarAlt, FaSignOutAlt } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
+import { logout } from "../../services/authenticationService";
 
 const UserDashboard = () => {
   const { appState, setAppState } = useContext(AppContext);
-  const [activeSection, setActiveSection] = useState('calendar');
+  const [activeSection, setActiveSection] = useState("calendar");
   const navigate = useNavigate();
 
   const handleLogout = async () => {
@@ -20,17 +20,9 @@ const UserDashboard = () => {
         userData: null,
         token: null,
       });
-      navigate('/login');
+      navigate("/login");
     } catch (error) {
-      console.error('Logout failed:', error);
-    }
-  };
-
-  const handleAdminButtonClick = () => {
-    if (appState.userData?.isAdmin) {
-      window.location.href = '/admin';
-    } else {
-      alert('You do not have admin privileges.');
+      console.error("Logout failed:", error);
     }
   };
 
@@ -46,18 +38,22 @@ const UserDashboard = () => {
         <nav className="mt-6">
           <button
             className={`w-full flex items-center px-6 py-3 ${
-              activeSection === 'calendar' ? 'bg-blue-50 text-blue-600 dark:bg-blue-800 dark:text-blue-300' : 'text-gray-600 dark:text-gray-400'
+              activeSection === "calendar"
+                ? "bg-blue-50 text-blue-600 dark:bg-blue-800 dark:text-blue-300"
+                : "text-gray-600 dark:text-gray-400"
             }`}
-            onClick={() => setActiveSection('calendar')}
+            onClick={() => setActiveSection("calendar")}
           >
             <FaCalendarAlt className="mr-3" />
             Calendar
           </button>
           <button
             className={`w-full flex items-center px-6 py-3 ${
-              activeSection === 'settings' ? 'bg-blue-50 text-blue-600 dark:bg-blue-800 dark:text-blue-300' : 'text-gray-600 dark:text-gray-400'
+              activeSection === "settings"
+                ? "bg-blue-50 text-blue-600 dark:bg-blue-800 dark:text-blue-300"
+                : "text-gray-600 dark:text-gray-400"
             }`}
-            onClick={() => setActiveSection('settings')}
+            onClick={() => setActiveSection("settings")}
           >
             <FaCog className="mr-3" />
             Settings
@@ -76,7 +72,7 @@ const UserDashboard = () => {
       <div className="flex-1 p-8">
         <header className="flex justify-between items-center mb-8">
           <h1 className="text-2xl font-bold text-gray-800 dark:text-white">
-            {activeSection === 'calendar' ? 'My Calendar' : 'Settings'}
+            {activeSection === "calendar" ? "My Calendar" : "Settings"}
           </h1>
           <button className="p-2 rounded-full bg-gray-200 dark:bg-gray-700">
             <FaBell className="text-gray-600 dark:text-gray-300" />
@@ -84,7 +80,7 @@ const UserDashboard = () => {
         </header>
 
         <div className="grid grid-cols-3 gap-6">
-          {activeSection === 'calendar' ? (
+          {activeSection === "calendar" ? (
             <>
               <div className="col-span-2">
                 <PersonalCalendar />
@@ -95,14 +91,16 @@ const UserDashboard = () => {
               </div>
             </>
           ) : (
-            <div className="col-span-3">
-              {/* Settings content here */}
-            </div>
+            <div className="col-span-3">{/* Settings content here */}</div>
           )}
         </div>
-        <button onClick={handleAdminButtonClick} className="mt-4 p-2 bg-blue-500 text-white rounded hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-500">
-          Admin Dashboard
-        </button>
+        {appState.userData?.isAdmin && (
+          <li>
+            <a href="/admin-dashboard" className="text-indigo-600">
+              Admin Dashboard
+            </a>
+          </li>
+        )}
       </div>
     </div>
   );
