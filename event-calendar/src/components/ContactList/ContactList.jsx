@@ -2,10 +2,12 @@ import CreateContactList from "./CreateContactList";
 import { useState, useEffect } from "react";
 import { getContactLists, deleteContactList } from "../../services/contactListsService";
 import { auth } from "../../config/firebaseConfig";
+import { useNavigate } from "react-router-dom";
 
 function ContactList() {
     const [isModalOpen, setModalOpen] = useState(false);
     const [contactLists, setContactLists] = useState([]);
+    const navigate = useNavigate();
 
     useEffect(() => {
         fetchContactLists();
@@ -41,10 +43,17 @@ function ContactList() {
 
             <div className="grid grid-cols-3 gap-4">
                 {contactLists.map((list, index) => (
-                    <div key={index} className="p-4 border rounded shadow bg-gray-100 flex justify-between items-center">
+                    <div
+                        key={index}
+                        className="p-4 border rounded shadow bg-gray-100 flex justify-between items-center cursor-pointer"
+                        onClick={() => navigate(`/home/contact-lists/${list.name}`)}
+                    >
                         <span>{list.name}</span>
                         <button
-                            onClick={() => handleDelete(list.name)}
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                handleDelete(list.name);
+                            }}
                             className="bg-red-500 text-white px-2 py-1 rounded"
                         >
                             Delete

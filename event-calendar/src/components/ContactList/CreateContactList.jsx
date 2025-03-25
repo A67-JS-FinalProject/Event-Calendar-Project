@@ -2,6 +2,7 @@ import PropTypes from 'prop-types';
 import { updateUserContactLists } from '../../services/contactListsService';
 import { auth } from '../../config/firebaseConfig';
 import { useEffect, useState } from 'react';
+import { getContactLists } from '../../services/contactListsService';
 
 function CreateContactList({ isOpen, onRequestClose }) {
 
@@ -22,8 +23,13 @@ function CreateContactList({ isOpen, onRequestClose }) {
         return () => unsubscribe();
     }, []);
 
-    const handleInputChange = (e) => {
-        setContactListName(e.target.value);
+    const handleInputChange = async (e) => {
+        const newListName = e.target.value;
+        try {
+            setContactListName(newListName);
+        } catch {
+            alert("An error occurred while checking the contact list. Please try again.");
+        }
     };
 
     const handleFormSubmit = async (e) => {
@@ -32,6 +38,15 @@ function CreateContactList({ isOpen, onRequestClose }) {
 
         if (authUser) {
             try {
+
+                const lists = await getContactLists(authUser.email);
+                const listNames = lists.map(list => list.name);
+
+            if (listNames.includes(contactListName)) {
+                alert("List name already exists. Please choose a different name.");
+                return;
+            }
+            
                 await updateUserContactLists(authUser.email, contactListName, participants);
                 console.log("Contact List created successfully.");
                 setContactListName('');
@@ -86,7 +101,7 @@ function CreateContactList({ isOpen, onRequestClose }) {
                         </svg>
                         <input
                             type="search"
-                            placeholder="Search"
+                            placeholder="Search by name, user, email, phone"
                             value={searchQuery}
                             onChange={async (e) => {
                                 const query = e.target.value.toLowerCase();
