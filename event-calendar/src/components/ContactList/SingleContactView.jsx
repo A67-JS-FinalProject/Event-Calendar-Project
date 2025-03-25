@@ -4,6 +4,7 @@ import { getContactListParticipants } from "../../services/contactListsService";
 import { auth } from "../../config/firebaseConfig";
 import { getUserByEmail } from "../../services/usersService";
 import { deleteSingleContact } from "../../services/contactListsService";
+import AddContact from "./AddContact";
 
 function SingleContactView() {
     const { listName } = useParams();
@@ -11,7 +12,9 @@ function SingleContactView() {
     const [authUser, setAuthUser] = useState(null);
     const [userDetails, setUserDetails] = useState({});
     const [loading, setLoading] = useState(true);
+    const [isModalOpen, setModalOpen] = useState(false);
 
+    
     useEffect(() => {
         const fetchUser = async () => {
             const user = auth.currentUser;
@@ -68,6 +71,15 @@ function SingleContactView() {
         fetchParticipants();
     }, [listName, authUser]);
 
+    const handleAddParticipant = (newParticipant) => {
+        if (participants.includes(newParticipant)) {
+            console.warn("Participant already exists in the contact list.");
+            return;
+        }
+    
+        setParticipants((prevParticipants) => [...prevParticipants, newParticipant]);
+    };
+
     const handleDelete = async (contactEmail) => {
         try {   
             const token = await auth.currentUser.getIdToken();
@@ -90,7 +102,7 @@ function SingleContactView() {
         <div>
             <h1 className="text-2xl font-bold mb-6 mt-6 text-center">Contacts in {listName}</h1>
             <div className="flex justify-end">
-                <button className="btn btn-info mb-5 mr-7">Add</button>
+                <button onClick={() => setModalOpen(true)}className="btn btn-info mb-5 mr-7">Add</button>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mr-6 ml-6">
                 {participants.length === 0 ? (
@@ -128,6 +140,12 @@ function SingleContactView() {
                     ))
                 )}
             </div>
+            <AddContact
+                isOpen={isModalOpen}
+                onRequestClose={() => setModalOpen(false)}
+                listName={listName}
+                onAddParticipant={handleAddParticipant}
+                />
         </div>
     );
 }

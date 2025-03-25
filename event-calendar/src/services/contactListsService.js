@@ -92,3 +92,33 @@ export const deleteSingleContact = async (email, listName, contactEmail) => {
     throw error;
   }
 }
+
+// Put contacts in a contact list
+export const putContactsInContactList = async (email, listName, newUsers = []) => {
+  try {
+    // Fetch existing users first
+    const existingData = await getContactListParticipants(email, listName);
+    const existingUsers = existingData.users || [];
+
+    // Merge existing users with new users (avoid duplicates)
+    const usersToAdd = newUsers.filter(user => !existingUsers.includes(user));
+
+    if (usersToAdd.length === 0) {
+      return { message: "No new users to add." };
+    }
+
+    // Send only new users to backend
+    const response = await fetch(`${URL}/users/${email}/contactLists/${listName}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ users: usersToAdd }),
+    });
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error updating contact list:", error);
+    throw error;
+  }
+};
