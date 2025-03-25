@@ -56,6 +56,7 @@ export const deleteContactList = async (email, listName) => {
   }
 };
 
+// Retrieve participants of a contact list
 export const getContactListParticipants = async (email, listName) => {
 
   try {
@@ -74,3 +75,20 @@ export const getContactListParticipants = async (email, listName) => {
     throw error;
   }
 };
+
+// Delete a contact from a contact list
+export const deleteSingleContact = async (email, listName, contactEmail) => {
+  try {
+    const response = await fetch(`${URL}/users/${email}/contactLists/${listName}/${contactEmail}`, {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+    });
+
+    if (!response.ok) throw new Error("Failed to delete contact");
+
+    return { message: "Contact deleted successfully" };
+  } catch (error) {
+    console.error("Error deleting contact:", error);
+    throw error;
+  }
+}
