@@ -94,7 +94,7 @@ function LandingPage() {
       <NavBarPublic />
 
       {/* Hero Section with Search and Auth */}
-      <section className="relative bg-[#DA4735] py-24 text-center text-white">
+      <section className="bg-[#DA4735] py-24 text-center text-white">
         <div className="container mx-auto px-4">
           <h1 className="text-4xl md:text-6xl font-extrabold mb-6 leading-tight">
             EventHub Pro
