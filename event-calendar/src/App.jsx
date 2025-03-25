@@ -12,7 +12,7 @@ import { useState, useEffect } from "react";
 import Authenticated from "./hoc/authenticated.jsx";
 import Footer from "./components/Footer/Footer.jsx";
 import UserDashboard from "./components/Dashboard/UserDashboard";
-import AdminRoute from "./hoc/adminRoute.jsx";
+// import AdminRoute from "./hoc/adminRoute.jsx";
 import AdminDashboard from "./components/AdminDashboard/AdminDashboard";
 import ContactList from "./components/ContactList/ContactList";
 
@@ -62,6 +62,7 @@ function App() {
               </Authenticated>
             }
           />
+
           <Route
             path="/home/contact-lists"
             element={
@@ -70,12 +71,7 @@ function App() {
               </Authenticated>
             }
           />
-          <Route
-            path="/admin"
-            element={
-                <AdminDashboard />
-            }
-          />
+          <Route path="/admin" element={<AdminDashboard />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Router>

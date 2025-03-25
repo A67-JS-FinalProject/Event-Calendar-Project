@@ -19,6 +19,8 @@ EventRoutes.route("/events").post(async (request, response) => {
     participants,
     isPublic,
     isRecurring,
+    isIndefinite,
+    recurrenceType,
     eventCover,
     tags,
     reminders,
@@ -32,13 +34,15 @@ EventRoutes.route("/events").post(async (request, response) => {
     endDate,
     location,
     description,
-    participants: participants.map(p => ({
+    participants: participants.map((p) => ({
       ...p,
-      status: p.email === request.body.organizer ? 'accepted' : 'pending',
-      role: p.email === request.body.organizer ? 'organizer' : 'invitee'
+      status: p.email === request.body.organizer ? "accepted" : "pending",
+      role: p.email === request.body.organizer ? "organizer" : "invitee",
     })),
     isPublic,
     isRecurring,
+    isIndefinite,
+    recurrenceType,
     eventCover,
     tags,
     reminders,
@@ -93,7 +97,7 @@ EventRoutes.route("/events/:id").get(async (request, response) => {
 });
 
 // 4. Update One
-EventRoutes.route("/events/:id").post(async (request, response) => {
+EventRoutes.route("/events/:id").put(async (req, res) => {
   const db = database.getDb();
   const {
     title,
@@ -104,12 +108,15 @@ EventRoutes.route("/events/:id").post(async (request, response) => {
     participants,
     isPublic,
     isRecurring,
+    isIndefinite,
+    recurrenceType,
     eventCover,
     tags,
     reminders,
-  } = request.body;
-
-  const newEvent = {
+    createdBy,
+    email,
+  } = req.body;
+  const updatedEvent = {
     $set: {
       title,
       startDate,
@@ -119,40 +126,43 @@ EventRoutes.route("/events/:id").post(async (request, response) => {
       participants,
       isPublic,
       isRecurring,
+      isIndefinite,
+      recurrenceType,
       eventCover,
       tags,
       reminders,
+      createdBy,
+      email,
     },
   };
-
   try {
     const result = await db
       .collection("events")
-      .updateOne({ _id: new ObjectId(request.params.id) }, newEvent);
+      .updateOne({ _id: new ObjectId(req.params.id) }, updatedEvent);
     if (result.modifiedCount > 0) {
-      response.status(200).json({ message: "Event updated successfully" });
+      res.status(200).json({ message: "Event updated successfully" });
     } else {
-      response.status(404).json({ error: "Event not found" });
+      res.status(404).json({ error: "Event not found" });
     }
   } catch (error) {
-    response.status(500).json({ error: error.message });
+    res.status(500).json({ error: error.message });
   }
 });
 
-// 5. Delete One
-EventRoutes.route("/events/:id").delete(async (request, response) => {
+// Delete event
+EventRoutes.route("/events/:id").delete(async (req, res) => {
   const db = database.getDb();
   try {
     const result = await db
       .collection("events")
-      .deleteOne({ _id: new ObjectId(request.params.id) });
+      .deleteOne({ _id: new ObjectId(req.params.id) });
     if (result.deletedCount > 0) {
-      response.status(200).json({ message: "Event deleted successfully" });
+      res.status(200).json({ message: "Event deleted successfully" });
     } else {
-      response.status(404).json({ error: "Event not found" });
+      res.status(404).json({ error: "Event not found" });
     }
   } catch (error) {
-    response.status(500).json({ error: error.message });
+    res.status(500).json({ error: error.message });
   }
 });
 
@@ -188,9 +198,13 @@ EventRoutes.route("/admin/events/:id").put(
       participants,
       isPublic,
       isRecurring,
+      isIndefinite,
+      recurrenceType,
       eventCover,
       tags,
       reminders,
+      createdBy,
+      email,
     } = req.body;
 
     const updatedEvent = {
@@ -203,9 +217,13 @@ EventRoutes.route("/admin/events/:id").put(
         participants,
         isPublic,
         isRecurring,
+        isIndefinite,
+        recurrenceType,
         eventCover,
         tags,
         reminders,
+        createdBy,
+        email,
       },
     };
 
@@ -246,31 +264,37 @@ EventRoutes.route("/admin/events/:id").delete(
 );
 
 // Add this route to handle invitation responses
-EventRoutes.route("/events/invitations/:id/respond").post(async (request, response) => {
-  const db = database.getDb();
-  try {
-    const { userId, response: inviteResponse } = request.body;
-    const result = await db.collection("events").updateOne(
-      { 
-        _id: new ObjectId(request.params.id),
-        "participants.email": userId // Ensure matching by email field
-      },
-      { 
-        $set: { 
-          "participants.$.status": inviteResponse,
-          "participants.$.respondedAt": new Date()
+EventRoutes.route("/events/invitations/:id/respond").post(
+  async (request, response) => {
+    const db = database.getDb();
+    try {
+      const { userId, response: inviteResponse } = request.body;
+      const result = await db.collection("events").updateOne(
+        {
+          _id: new ObjectId(request.params.id),
+          "participants.email": userId, // Ensure matching by email field
+        },
+        {
+          $set: {
+            "participants.$.status": inviteResponse,
+            "participants.$.respondedAt": new Date(),
+          },
         }
-      }
-    );
+      );
 
-    if (result.modifiedCount === 0) {
-      response.status(404).json({ error: "Invitation not found or already processed" });
-    } else {
-      response.status(200).json({ message: "Invitation response recorded successfully" });
+      if (result.modifiedCount === 0) {
+        response
+          .status(404)
+          .json({ error: "Invitation not found or already processed" });
+      } else {
+        response
+          .status(200)
+          .json({ message: "Invitation response recorded successfully" });
+      }
+    } catch (error) {
+      response.status(500).json({ error: error.message });
     }
-  } catch (error) {
-    response.status(500).json({ error: error.message });
   }
-});
+);
 
 export default EventRoutes;
