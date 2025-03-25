@@ -72,9 +72,10 @@ export default function NavBarPublic() {
                     <ul className="absolute top-12 left-0 w-full bg-white shadow-md rounded-md mt-1">
                         {filteredEvents.map((event) => (
                             <li key={event._id} className="px-4 py-2 hover:bg-gray-200">
-                                <Link to={`/event/${event._id}`}>{event.title}</Link>
+                                <Link to={`/events/${event._id}`}>{event.title}</Link>
                             </li>
                         ))}
+                        
                     </ul>
                 )}
             </div>
