@@ -136,7 +136,7 @@ function CreateAnEvent({ isOpen, onRequestClose }) {
     }
   };
 
-  const validateFields = () => {
+  const validateFields = async () => {
     let valid = true;
     let newErrors = {
       title: "",
@@ -163,12 +163,29 @@ function CreateAnEvent({ isOpen, onRequestClose }) {
     if (participants) {
       const emails = participants.split(",").map((email) => email.trim());
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      
       const invalidEmails = emails.filter((email) => !emailRegex.test(email));
       if (invalidEmails.length > 0) {
-        newErrors.participants = `Invalid email(s): ${invalidEmails.join(
-          ", "
-        )}`;
-        valid = false;
+          newErrors.participants = `Invalid email(s): ${invalidEmails.join(", ")}`;
+          valid = false;
+      }
+
+      try {
+          const checkOptedOut = async () => {
+              for (const email of emails) {
+                  const userData = await getUserByEmail(email, token);
+                  if (userData?.optOutOfInvitations) {
+                      newErrors.participants = `${email} has opted out of receiving invitations`;
+                      valid = false;
+                      break;
+                  }
+              }
+          };
+          await checkOptedOut();
+      } catch (error) {
+          console.error("Error checking opted-out status:", error);
+          newErrors.participants = "Error validating participant preferences";
+          valid = false;
       }
     }
 
@@ -185,7 +202,7 @@ function CreateAnEvent({ isOpen, onRequestClose }) {
       return;
     }
 
-    if (!validateFields()) {
+    if (!await validateFields()) {
       return;
     }
 
@@ -205,7 +222,6 @@ function CreateAnEvent({ isOpen, onRequestClose }) {
     }
 
     try {
-      // Create array of participant emails including the creator
       let participantEmails = participants
         ? participants.split(",").map((p) => p.trim())
         : [];
@@ -213,11 +229,9 @@ function CreateAnEvent({ isOpen, onRequestClose }) {
         participantEmails.push(userData.email);
       }
 
-      // Generate all event dates (single date or recurring dates)
       const eventDates = isRecurring ? generateRecurringDates() : [startDate];
       let createdEventIds = [];
 
-      // Create each event in the series
       for (const eventDate of eventDates) {
         const event = {
           title,
@@ -267,7 +281,6 @@ function CreateAnEvent({ isOpen, onRequestClose }) {
         createdEventIds.push(createdEvent._id);
       }
 
-      // Update user's events list
       const updatedEvents = Array.isArray(userData.events)
         ? [...userData.events, ...createdEventIds]
         : [...createdEventIds];

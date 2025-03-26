@@ -30,7 +30,7 @@ function RenderEvent() {
   }
   const isOrganizer = data?.organizer === appState.user;
 
-  console.log("Cover Photo URL:", data.eventCover); // Log the URL to the console
+  console.log("Cover Photo URL:", data.eventCover);
 
   const handleUpdateParticipants = (updatedParticipants) => {
     setData((prevData) => ({
@@ -127,7 +127,7 @@ function RenderEvent() {
               </div>
               <p className="text-black">Location: {data.location}</p>
               <p className="text-black">
-                Participants: {data.participants.join(", ")}
+                Participants: {data.participants.map(participant => participant.email).join(", ")}
               </p>
               <p className="text-black">
                 Public: {data.isPublic ? "Yes" : "No"}

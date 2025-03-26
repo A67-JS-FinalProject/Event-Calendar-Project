@@ -15,7 +15,6 @@ function EventInvitationsList() {
       });
       const data = await response.json();
       
-      // Filter events where user is an invitee and has pending status
       const userInvitations = data.filter(event => 
         event.participants.some(p => 
           p.email === appState.user && 
@@ -53,8 +52,7 @@ function EventInvitationsList() {
         body: JSON.stringify({ response })
       });
 
-      // Refresh invitations list after response
-      fetchInvitations();  // This refreshes the list after a response is submitted
+      fetchInvitations();
     } catch (error) {
       console.error('Error updating invitation:', error);
     }

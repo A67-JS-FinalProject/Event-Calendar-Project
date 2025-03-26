@@ -14,6 +14,7 @@ function Details() {
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
     const [uploading, setUploading] = useState(false);
+    const [optOutOfInvitations, setOptOutOfInvitations] = useState(false);
 
     useEffect(() => {
         const unsubscribe = auth.onAuthStateChanged(async (authUser) => {
@@ -31,6 +32,7 @@ function Details() {
                         setLastName(userData.lastName || "");
                         setPhoneNumber(userData.phoneNumber || "");
                         setProfilePictureURL(userData.profilePictureURL || "");
+                        setOptOutOfInvitations(userData.optOutOfInvitations || false);
                     } else {
                         console.log("User data not found");
                         setError("User data not found");
@@ -109,6 +111,7 @@ function Details() {
                 lastName,
                 phoneNumber,
                 profilePictureURL,
+                optOutOfInvitations
             });
             setSuccess("Profile updated successfully!");
         } catch (error) {
@@ -181,6 +184,20 @@ function Details() {
                         onChange={(e) => setPhoneNumber(e.target.value)}
                         placeholder="Enter your phone number"
                     />
+                </div>
+                <div className="mb-4">
+                    <label className="flex items-center space-x-2">
+                        <input
+                            type="checkbox"
+                            checked={optOutOfInvitations}
+                            onChange={(e) => setOptOutOfInvitations(e.target.checked)}
+                            className="checkbox"
+                        />
+                        <span>Opt out of event invitations</span>
+                    </label>
+                    <p className="text-sm text-gray-500 mt-1">
+                        When enabled, you won't receive any event invitations
+                    </p>
                 </div>
                 {error && <p className="text-red-500 mb-4">{error}</p>}
                 {success && <p className="text-green-500 mb-4">{success}</p>}
