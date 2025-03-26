@@ -104,7 +104,7 @@ const EventManager = () => {
             return (
               <Link
                 key={event._id}
-                to={`/event/${event._id}`}
+                to={`/events/${event._id}`}
                 className="block p-4 border rounded hover:bg-gray-50 dark:hover:bg-gray-700"
               >
                 <div className="flex justify-between items-start">
