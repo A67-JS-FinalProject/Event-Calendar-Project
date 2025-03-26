@@ -24,13 +24,19 @@ function App() {
     userData: null,
     token: null,
   });
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const storedState = localStorage.getItem("appState");
     if (storedState) {
       setAppState(JSON.parse(storedState));
     }
+    setIsLoading(false); // Mark loading as complete
   }, []);
+
+  if (isLoading) {
+    return <div>Loading...</div>; // Show a loading indicator
+  }
 
   return (
     <AppContext.Provider value={{ appState, setAppState }}>

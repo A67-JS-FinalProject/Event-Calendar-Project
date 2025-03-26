@@ -11,6 +11,7 @@ export const getUserByEmail = async (email, token) => {
     });
     const allUsers = await response.json();
     const user = allUsers.find((user) => user.email === email);
+
     return user;
   } catch (error) {
     console.error("Error fetching data:", error);
