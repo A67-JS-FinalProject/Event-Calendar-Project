@@ -1,4 +1,3 @@
-// filepath: d:\Final -project\Event-Calendar-Project\event-calendar\src\components\Register\Register.jsx
 import { useState, useContext } from "react";
 import { registerUser } from "../../services/authenticationService";
 import { createUser } from "../../services/usersService";
@@ -85,19 +84,90 @@ const Register = () => {
   return (
     <>
       <NavBarPublic />
-      <div className="flex justify-center items-center min-h-screen bg-gray-100">
-        <form className="flex flex-col p-6 w-96 bg-white shadow-md rounded-lg" onSubmit={handleRegister}>
-          <h2 className="text-2xl font-bold mb-4 text-center">Register</h2>
-          {Object.values(errors).map((err, index) => (
-            <p key={index} className="text-red-500 text-sm">{err}</p>
-          ))}
-          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" className="mb-2 p-2 border rounded" />
-          <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} placeholder="Username" className="mb-2 p-2 border rounded" />
-          <input type="text" value={firstName} onChange={(e) => setFirstName(e.target.value)} placeholder="First Name" className="mb-2 p-2 border rounded" />
-          <input type="text" value={lastName} onChange={(e) => setLastName(e.target.value)} placeholder="Last Name" className="mb-2 p-2 border rounded" />
-          <input type="text" value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} placeholder="Phone Number" className="mb-2 p-2 border rounded" />
-          <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" className="mb-2 p-2 border rounded" />
-          <button type="submit" className="p-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-all duration-200">Register</button>
+      <div className="flex justify-center items-center min-h-screen bg-gray-50">
+        <form 
+          className="flex flex-col p-8 w-full max-w-md bg-white shadow-lg rounded-xl border border-gray-100" 
+          onSubmit={handleRegister}
+        >
+          <h2 className="text-3xl font-bold mb-6 text-center text-[#DA4735]">Create Account</h2>
+          
+          {Object.values(errors).length > 0 && (
+            <div className="mb-4 p-3 bg-red-50 border-l-4 border-[#DA4735] rounded">
+              {Object.values(errors).map((err, index) => (
+                <p key={index} className="text-[#DA4735] text-sm mb-1 last:mb-0">{err}</p>
+              ))}
+            </div>
+          )}
+
+          <div className="space-y-4">
+            <div>
+              <input 
+                type="email" 
+                value={email} 
+                onChange={(e) => setEmail(e.target.value)} 
+                placeholder="Email" 
+                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#DA4735] focus:border-transparent outline-none transition-all" 
+              />
+            </div>
+            
+            <div>
+              <input 
+                type="text" 
+                value={username} 
+                onChange={(e) => setUsername(e.target.value)} 
+                placeholder="Username" 
+                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#DA4735] focus:border-transparent outline-none transition-all" 
+              />
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <input 
+                  type="text" 
+                  value={firstName} 
+                  onChange={(e) => setFirstName(e.target.value)} 
+                  placeholder="First Name" 
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#DA4735] focus:border-transparent outline-none transition-all" 
+                />
+              </div>
+              <div>
+                <input 
+                  type="text" 
+                  value={lastName} 
+                  onChange={(e) => setLastName(e.target.value)} 
+                  placeholder="Last Name" 
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#DA4735] focus:border-transparent outline-none transition-all" 
+                />
+              </div>
+            </div>
+            
+            <div>
+              <input 
+                type="text" 
+                value={phoneNumber} 
+                onChange={(e) => setPhoneNumber(e.target.value)} 
+                placeholder="Phone Number" 
+                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#DA4735] focus:border-transparent outline-none transition-all" 
+              />
+            </div>
+            
+            <div>
+              <input 
+                type="password" 
+                value={password} 
+                onChange={(e) => setPassword(e.target.value)} 
+                placeholder="Password" 
+                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#DA4735] focus:border-transparent outline-none transition-all" 
+              />
+            </div>
+          </div>
+
+          <button 
+            type="submit" 
+            className="mt-6 p-3 bg-[#DA4735] text-white rounded-lg hover:bg-[#c23d2d] focus:outline-none focus:ring-2 focus:ring-[#DA4735] focus:ring-opacity-50 transition-all duration-200 font-medium"
+          >
+            Register
+          </button>
         </form>
       </div>
     </>

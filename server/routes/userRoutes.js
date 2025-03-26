@@ -70,6 +70,7 @@ userRoutes.route("/users/:email").put(async (req, res) => {
         lastName: req.body.lastName,
         phoneNumber: req.body.phoneNumber,
         profilePictureURL: req.body.profilePictureURL,
+        optOutOfInvitations: req.body.optOutOfInvitations // Add this line
       },
     };
 
