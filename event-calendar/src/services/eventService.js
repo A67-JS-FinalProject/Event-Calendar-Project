@@ -193,6 +193,16 @@ export const getEventsByDateRange = async (startDate, endDate, token) => {
 
 export const updateEventParticipants = async (eventId, participants, token) => {
   try {
+    // Validate eventId
+    if (!eventId || typeof eventId !== 'string') {
+      throw new Error('Invalid event ID format');
+    }
+
+    // Validate participants array
+    if (!Array.isArray(participants)) {
+      throw new Error('Participants must be an array');
+    }
+
     const response = await fetch(`${URL}/events/${eventId}/participants`, {
       method: "PATCH",
       headers: {
@@ -201,6 +211,12 @@ export const updateEventParticipants = async (eventId, participants, token) => {
       },
       body: JSON.stringify({ participants }),
     });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Failed to update participants');
+    }
+
     const data = await response.json();
     return data;
   } catch (error) {

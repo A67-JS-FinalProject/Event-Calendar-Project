@@ -2,6 +2,7 @@ import { useState, useContext, useEffect } from "react";
 import { createEvent } from "../../services/eventService";
 import { AppContext } from "../../store/app.context";
 import { getUserByEmail, updateUserEvent } from "../../services/usersService";
+import { getContactLists } from '../../services/contactListsService';
 import { useNavigate } from "react-router-dom";
 import PropTypes from "prop-types";
 
@@ -49,10 +50,16 @@ function CreateAnEvent({ isOpen, onRequestClose }) {
     location: "",
     description: "",
   });
-
-  const { appState } = useContext(AppContext);
+  const [contactLists, setContactLists] = useState([]);
+  const [selectedContactList, setSelectedContactList] = useState('');
+  const { appState, setAppState } = useContext(AppContext);
   const { user, token } = appState;
   const navigate = useNavigate();
+  
+  const [participantPermissions, setParticipantPermissions] = useState({
+    canInviteOthers: false,
+    canViewGuestList: true
+  });
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -65,6 +72,35 @@ function CreateAnEvent({ isOpen, onRequestClose }) {
 
     fetchUserData();
   }, [user, token]);
+
+  useEffect(() => {
+    const fetchContactLists = async () => {
+      if (user) {
+        try {
+          const lists = await getContactLists(user);
+          setContactLists(lists);
+        } catch (error) {
+          console.error('Error fetching contact lists:', error);
+        }
+      }
+    };
+
+    fetchContactLists();
+  }, [user]);
+
+  const handleContactListSelect = async (listName) => {
+    setSelectedContactList(listName); 
+    const selectedList = contactLists.find(list => list.name === listName);
+    if (selectedList){
+      const participantEmails = selectedList.users.join(', ');
+      setParticipants(prevParticipants => {
+        const currentEmails = prevParticipants ? prevParticipants.split(',').map(p => p.trim()) : [];
+        const newEmails = participantEmails.split(',').map(p => p.trim());
+        const uniqueEmails = [...new Set([...currentEmails, ...newEmails])];
+        return uniqueEmails.join(', ');
+      });
+    }
+  };
 
   const handleFileChange = async (event) => {
     const file = event.target.files[0];
@@ -321,6 +357,38 @@ function CreateAnEvent({ isOpen, onRequestClose }) {
     "22:00",
     "23:00",
   ];
+  const PermissionsManager = () => (
+    <div className="mb-4">
+      <h3 className="text-lg font-semibold mb-2">Participant Permissions</h3>
+      <div className="space-y-2">
+        <label className="flex items-center">
+          <input
+            type="checkbox"
+            checked={participantPermissions.canInviteOthers}
+            onChange={(e) => setParticipantPermissions(prev => ({
+              ...prev,
+              canInviteOthers: e.target.checked
+            }))}
+            className="mr-2"
+          />
+          Participants can invite others
+        </label>
+        <label className="flex items-center">
+          <input
+            type="checkbox"
+            checked={participantPermissions.canViewGuestList}
+            onChange={(e) => setParticipantPermissions(prev => ({
+              ...prev,
+              canViewGuestList: e.target.checked
+            }))}
+            className="mr-2"
+          />
+          Participants can view guest list
+        </label>
+      </div>
+    </div>
+  );
+
   if (!isOpen) return null;
   return (
     <div className="fixed inset-0 flex items-center justify-center  z-50">
@@ -473,18 +541,32 @@ function CreateAnEvent({ isOpen, onRequestClose }) {
           </div>
 
           <div className="form-control mb-4 flex flex-row items-center space-x-6 px-6">
-            <div>
-              <MdPeopleAlt className="text-2xl" />
-            </div>
-            <input
-              value={participants}
-              onChange={(e) => setParticipants(e.target.value)}
-              placeholder="Add participants"
-              className={`input w-full border-0 border-b-2 border-gray-300 focus:outline-none 
-    focus:border-b-4 focus:border-blue-500 focus:bg-pink-300 
-    focus:text-blue-100 focus:opacity-100 transition-all`}
-            />
-          </div>
+  <div>
+    <MdPeopleAlt className="text-2xl" />
+  </div>
+  <div className="flex flex-col w-full gap-2">
+    <input
+      value={participants}
+      onChange={(e) => setParticipants(e.target.value)}
+      placeholder="Add participants"
+      className="input w-full border-0 border-b-2 border-gray-300 focus:outline-none 
+      focus:border-b-4 focus:border-blue-500 focus:bg-pink-300 
+      focus:text-blue-100 focus:opacity-100 transition-all"
+    />
+    <select
+      value={selectedContactList}
+      onChange={(e) => handleContactListSelect(e.target.value)}
+      className="select select-bordered w-full"
+    >
+      <option value="">Select from contact lists</option>
+      {contactLists.map(list => (
+        <option key={list.name} value={list.name}>
+          {list.name} ({list.users?.length || 0} contacts)
+        </option>
+      ))}
+    </select>
+  </div>
+</div>
           {errors.participants && (
             <span
               style={{
@@ -639,7 +721,8 @@ function CreateAnEvent({ isOpen, onRequestClose }) {
                 </div>
               ))}
             </div>
-            <button
+            <PermissionsManager />
+          <button
               type="button"
               onClick={createAReminder}
               className="btn btn-ghost btn-block"
