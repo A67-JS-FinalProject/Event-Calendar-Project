@@ -205,7 +205,6 @@ function CreateAnEvent({ isOpen, onRequestClose }) {
     }
 
     try {
-      // Create array of participant emails including the creator
       let participantEmails = participants
         ? participants.split(",").map((p) => p.trim())
         : [];
@@ -213,11 +212,9 @@ function CreateAnEvent({ isOpen, onRequestClose }) {
         participantEmails.push(userData.email);
       }
 
-      // Generate all event dates (single date or recurring dates)
       const eventDates = isRecurring ? generateRecurringDates() : [startDate];
       let createdEventIds = [];
 
-      // Create each event in the series
       for (const eventDate of eventDates) {
         const event = {
           title,
@@ -267,7 +264,6 @@ function CreateAnEvent({ isOpen, onRequestClose }) {
         createdEventIds.push(createdEvent._id);
       }
 
-      // Update user's events list
       const updatedEvents = Array.isArray(userData.events)
         ? [...userData.events, ...createdEventIds]
         : [...createdEventIds];

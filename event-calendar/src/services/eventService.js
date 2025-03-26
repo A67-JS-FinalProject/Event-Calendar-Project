@@ -195,12 +195,11 @@ export const updateEventParticipants = async (eventId, participants, token) => {
       throw new Error('Invalid event ID');
     }
 
-    // Add debug logging
     console.log('Making request to:', `${URL}/events/${eventId}`);
     console.log('Payload:', { participants });
 
     const response = await fetch(`${URL}/events/${eventId}`, {
-      method: 'PUT', // Changed from PATCH to PUT
+      method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`

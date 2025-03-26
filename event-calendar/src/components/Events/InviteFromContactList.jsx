@@ -43,7 +43,7 @@ function InviteFromContactList({ eventId, currentParticipants, onUpdate }) {
     }
 
     try {
-      // Format participants data according to API requirements
+
       const currentEmails = currentParticipants.map(p => p.email);
       const newParticipants = selectedUsers
         .filter(email => !currentEmails.includes(email))
@@ -64,7 +64,7 @@ function InviteFromContactList({ eventId, currentParticipants, onUpdate }) {
 
       const updatedParticipants = [...currentParticipants, ...newParticipants];
 
-      // Add more detailed logging
+
       console.log('Current participants:', currentParticipants);
       console.log('New participants:', newParticipants);
       console.log('Updated participants:', updatedParticipants);
@@ -121,18 +121,29 @@ function InviteFromContactList({ eventId, currentParticipants, onUpdate }) {
               <div className="mb-4 max-h-60 overflow-y-auto">
                 {contactLists
                   .find(list => list.name === selectedList)
-                  ?.users.map(email => (
-                    <div key={email} className="flex items-center gap-2 p-2">
-                      <input
-                        type="checkbox"
-                        id={email}
-                        checked={selectedUsers.includes(email)}
-                        onChange={() => handleUserSelect(email)}
-                        className="checkbox"
-                      />
-                      <label htmlFor={email}>{email}</label>
-                    </div>
-                  ))}
+                  ?.users.map(email => {
+
+                    const isAlreadyInvited = currentParticipants.some(p => p.email === email);
+                    
+                    return (
+                      <div key={email} className="flex items-center gap-2 p-2">
+                        <input
+                          type="checkbox"
+                          id={email}
+                          checked={selectedUsers.includes(email)}
+                          onChange={() => handleUserSelect(email)}
+                          className="checkbox"
+                          disabled={isAlreadyInvited}
+                        />
+                        <label 
+                          htmlFor={email}
+                          className={isAlreadyInvited ? "text-gray-400" : ""}
+                        >
+                          {email} {isAlreadyInvited ? "(Already invited)" : ""}
+                        </label>
+                      </div>
+                    );
+                })}
               </div>
             )}
 
