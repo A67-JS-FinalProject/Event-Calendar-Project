@@ -52,27 +52,39 @@ const Login = () => {
   return (
     <>
       <NavBarPublic />
-      <div className="flex justify-center items-center min-h-screen">
+      <div className="flex justify-center items-center min-h-screen bg-gray-50">
         <form
-          className="flex flex-col p-4 w-80 bg-black shadow-md rounded"
+          className="flex flex-col p-8 w-full max-w-md bg-white shadow-lg rounded-xl border border-gray-100"
           onSubmit={handleSubmit}
         >
-          <h2 className="text-2xl font-bold mb-4 text-center">Login</h2>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="Email"
-            className="mb-2 p-2 border rounded"
-          />
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Password"
-            className="mb-2 p-2 border rounded"
-          />
-          <button type="submit" className="p-2 bg-blue-500 text-black rounded">
+          <h2 className="text-3xl font-bold mb-6 text-center text-[#DA4735]">Welcome Back</h2>
+          
+          <div className="space-y-4">
+            <div>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Email"
+                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#DA4735] focus:border-transparent outline-none transition-all"
+              />
+            </div>
+            
+            <div>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Password"
+                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#DA4735] focus:border-transparent outline-none transition-all"
+              />
+            </div>
+          </div>
+
+          <button 
+            type="submit" 
+            className="mt-6 p-3 bg-[#DA4735] text-white rounded-lg hover:bg-[#c23d2d] focus:outline-none focus:ring-2 focus:ring-[#DA4735] focus:ring-opacity-50 transition-all duration-200 font-medium"
+          >
             Login
           </button>
         </form>
