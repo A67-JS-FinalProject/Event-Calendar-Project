@@ -41,7 +41,6 @@ const EventManager = () => {
     if (!events) return [];
     
     const now = new Date();
-    const currentUserEmail = appState.user?.email; // Get the current user's email
 
     switch (filter) {
       case 'upcoming':
@@ -49,10 +48,9 @@ const EventManager = () => {
       case 'past':
         return events.filter(event => new Date(event.startDate) < now);
       case 'created':
-        // Only show events where the current user is the organizer
         return events.filter(event => 
           event.organizer === appState.user?.uid || 
-          event.createdBy?.email === currentUserEmail
+          event.createdBy?.email === appState.user?.email
         );
       default:
         return events;
@@ -94,36 +92,51 @@ const EventManager = () => {
         <div className="text-center py-4">Loading...</div>
       ) : (
         <div className="space-y-4">
-          {getFilteredEvents().map(event => (
-            <Link
-              key={event._id}
-              to={`/event/${event._id}`}
-              className="block p-4 border rounded hover:bg-gray-50 dark:hover:bg-gray-700"
-            >
-              <div className="flex justify-between items-start">
-                <div>
-                  <h3 className="font-semibold text-gray-800 dark:text-white">
-                    {event.title}
-                  </h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-300">
-                    {new Date(event.startDate).toLocaleDateString()}
-                  </p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
-                    {event.location}
-                  </p>
+          {getFilteredEvents().map(event => {
+            const isCreator = event.createdBy?.email === appState.user?.email;
+            const isInvited = event.participants?.some(
+              participant => 
+                participant.email === appState.user?.email &&
+                participant.status === 'accepted' &&
+                participant.role !== 'organizer'
+            );
+
+            return (
+              <Link
+                key={event._id}
+                to={`/event/${event._id}`}
+                className="block p-4 border rounded hover:bg-gray-50 dark:hover:bg-gray-700"
+              >
+                <div className="flex justify-between items-start">
+                  <div>
+                    <h3 className="font-semibold text-gray-800 dark:text-white">
+                      {event.title}
+                    </h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-300">
+                      {new Date(event.startDate).toLocaleDateString()}
+                    </p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      {event.location}
+                    </p>
+                  </div>
+                  <div>
+                    <div>
+                      {isCreator && (
+                        <span className="text-xs px-2 py-1 rounded bg-blue-100 text-blue-800 dark:bg-blue-500 dark:text-blue-100 mr-1">
+                          Organizer
+                        </span>
+                      )}
+                      {!isCreator && isInvited && (
+                        <span className="text-xs px-2 py-1 rounded bg-green-100 text-green-800 dark:bg-green-500 dark:text-green-100">
+                          Invited
+                        </span>
+                      )}
+                    </div>
+                  </div>
                 </div>
-                {(event.organizer === appState.user?.uid || event.createdBy?.email === appState.user?.email) ? (
-                  <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded dark:bg-blue-500 dark:text-blue-100">
-                    Organizer
-                  </span>
-                ) : (
-                  <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded dark:bg-green-500 dark:text-green-100">
-                    Invited
-                  </span>
-                )}
-              </div>
-            </Link>
-          ))}
+              </Link>
+            );
+          })}
           {getFilteredEvents().length === 0 && (
             <p className="text-center text-gray-500 py-4 dark:text-gray-400">No events found</p>
           )}

@@ -3,7 +3,7 @@ import { AppContext } from "../../store/app.context";
 import PersonalCalendar from "./PersonalCalendar";
 import EventManager from "./EventManager";
 import EventInvitationsList from "../Events/EventInvitationsList";
-import { FaCog, FaBell, FaCalendarAlt, FaSignOutAlt } from "react-icons/fa";
+import { FaCog, FaCalendarAlt, FaSignOutAlt } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { logout } from "../../services/authenticationService";
 
@@ -74,9 +74,6 @@ const UserDashboard = () => {
           <h1 className="text-2xl font-bold text-gray-800 dark:text-white">
             {activeSection === "calendar" ? "My Calendar" : "Settings"}
           </h1>
-          <button className="p-2 rounded-full bg-gray-200 dark:bg-gray-700">
-            <FaBell className="text-gray-600 dark:text-gray-300" />
-          </button>
         </header>
 
         <div className="grid grid-cols-3 gap-6">

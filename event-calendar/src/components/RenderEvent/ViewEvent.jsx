@@ -5,6 +5,8 @@ import { getUserByEmail } from "../../services/usersService";
 import { CiCalendar } from "react-icons/ci";
 import { FaClock } from "react-icons/fa6";
 import { AppContext } from "../../store/app.context";
+import ManageParticipants from '../Events/ManageParticipants';
+import InviteFromContactList from '../Events/InviteFromContactList';
 
 function RenderEvent() {
   const { id } = useParams();
@@ -30,12 +32,12 @@ function RenderEvent() {
 
   console.log("Cover Photo URL:", data.eventCover); // Log the URL to the console
 
-  // const handleUpdateParticipants = (updatedParticipants) => {
-  //   setData((prevData) => ({
-  //     ...prevData,
-  //     participants: updatedParticipants,
-  //   }));
-  // };
+  const handleUpdateParticipants = (updatedParticipants) => {
+    setData((prevData) => ({
+      ...prevData,
+      participants: updatedParticipants,
+    }));
+  };
 
   return (
     <>
@@ -137,16 +139,22 @@ function RenderEvent() {
               <p className="text-black">
                 Reminders: {data.reminders.join("# ")}
               </p>
+          <InviteFromContactList 
+                eventId={id}
+                currentParticipants={data.participants}
+                onUpdate={handleUpdateParticipants}
+              />
             </div>
           </div>
-          {/* {isOrganizer && (
-            <ManageParticipants
-              eventId={id}
-              participants={data.participants}
-              onUpdate={handleUpdateParticipants}
-              currentUserEmail={appState.user}
-            />
-          )} */}
+          
+            <div className="flex flex-col gap-4">
+              <ManageParticipants
+                eventId={id}
+                participants={data.participants}
+                onUpdate={handleUpdateParticipants}
+                currentUserEmail={appState.user}
+              />
+            </div>
         </div>
       </div>
     </>
