@@ -3,101 +3,36 @@ import { AppContext } from "../../store/app.context";
 import PersonalCalendar from "./PersonalCalendar";
 import EventManager from "./EventManager";
 import EventInvitationsList from "../Events/EventInvitationsList";
-import { FaCog, FaCalendarAlt, FaSignOutAlt } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
-import { logout } from "../../services/authenticationService";
 
 const UserDashboard = () => {
-  const { appState, setAppState } = useContext(AppContext);
-  const [activeSection, setActiveSection] = useState("calendar");
-  const navigate = useNavigate();
-
-  const handleLogout = async () => {
-    try {
-      await logout();
-      setAppState({
-        user: null,
-        userData: null,
-        token: null,
-      });
-      navigate("/login");
-    } catch (error) {
-      console.error("Logout failed:", error);
-    }
-  };
+  const { appState } = useContext(AppContext);
+  const [activeSection] = useState("calendar");
 
   return (
-    <div className="flex h-screen bg-gray-100 dark:bg-gray-900">
-      {/* Sidebar */}
-      <div className="w-64 bg-white shadow-lg dark:bg-gray-800">
-        <div className="p-6">
-          <h2 className="text-xl font-semibold text-gray-800 dark:text-white">
-            {appState.userData?.username}&apos;s Dashboard
-          </h2>
-        </div>
-        <nav className="mt-6">
-          <button
-            className={`w-full flex items-center px-6 py-3 ${
-              activeSection === "calendar"
-                ? "bg-blue-50 text-blue-600 dark:bg-blue-800 dark:text-blue-300"
-                : "text-gray-600 dark:text-gray-400"
-            }`}
-            onClick={() => setActiveSection("calendar")}
-          >
-            <FaCalendarAlt className="mr-3" />
-            Calendar
-          </button>
-          <button
-            className={`w-full flex items-center px-6 py-3 ${
-              activeSection === "settings"
-                ? "bg-blue-50 text-blue-600 dark:bg-blue-800 dark:text-blue-300"
-                : "text-gray-600 dark:text-gray-400"
-            }`}
-            onClick={() => setActiveSection("settings")}
-          >
-            <FaCog className="mr-3" />
-            Settings
-          </button>
-          <button
-            className="w-full flex items-center px-6 py-3 text-gray-600 dark:text-gray-400"
-            onClick={handleLogout}
-          >
-            <FaSignOutAlt className="mr-3" />
-            Logout
-          </button>
-        </nav>
-      </div>
-
+    <div className="flex min-h-screen bg-white">
       {/* Main Content */}
-      <div className="flex-1 p-8">
-        <header className="flex justify-between items-center mb-8">
-          <h1 className="text-2xl font-bold text-gray-800 dark:text-white">
+      <div className="flex-1 p-6">
+        <header className="flex justify-between items-center mb-6">
+          <h1 className="text-2xl font-bold text-gray-800">
             {activeSection === "calendar" ? "My Calendar" : "Settings"}
           </h1>
         </header>
 
-        <div className="grid grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {activeSection === "calendar" ? (
             <>
-              <div className="col-span-2">
-                <PersonalCalendar />
+              <div className="lg:col-span-2">
+                <PersonalCalendar className="w-full h-full border border-gray-200 rounded-lg shadow-sm" />
               </div>
-              <div className="col-span-1">
-                <EventManager />
-                <EventInvitationsList /> {/* Add this line */}
+              <div className="lg:col-span-1 space-y-6">
+                <EventManager className="w-full h-full border border-gray-200 rounded-lg shadow-sm" />
+                <EventInvitationsList className="border border-gray-200 rounded-lg shadow-sm p-4 bg-white" />
               </div>
             </>
           ) : (
             <div className="col-span-3">{/* Settings content here */}</div>
           )}
         </div>
-        {appState.userData?.isAdmin && (
-          <li>
-            <a href="/admin-dashboard" className="text-indigo-600">
-              Admin Dashboard
-            </a>
-          </li>
-        )}
       </div>
     </div>
   );

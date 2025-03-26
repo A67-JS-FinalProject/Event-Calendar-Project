@@ -24,7 +24,6 @@ const Home = () => {
           getEventById(eventId)
         );
         const eventData = await Promise.all(eventPromises);
-        console.log("Fetched User Events:", eventData); // Debugging
         setEvents(eventData);
       } catch (error) {
         console.error("Error fetching user events:", error);
@@ -35,31 +34,20 @@ const Home = () => {
   }, [userData]);
 
   const renderEvents = (date) => {
-    console.log("Rendering events for date:", date.toISOString());
-
     const filteredEvents = events.filter((event) => {
-      if (!event.startDate) {
-        console.warn("Event missing startDate:", event);
-        return false;
-      }
-
-      try {
-        const eventDate = new Date(event.startDate);
-        return (
-          eventDate.getUTCFullYear() === date.getUTCFullYear() &&
-          eventDate.getUTCMonth() === date.getUTCMonth() &&
-          eventDate.getUTCDate() === date.getUTCDate()
-        );
-      } catch (error) {
-        console.error("Invalid date format in event:", error);
-        return false;
-      }
+      if (!event.startDate) return false;
+      const eventDate = new Date(event.startDate);
+      return (
+        eventDate.getUTCFullYear() === date.getUTCFullYear() &&
+        eventDate.getUTCMonth() === date.getUTCMonth() &&
+        eventDate.getUTCDate() === date.getUTCDate()
+      );
     });
 
     return (
       <>
         {filteredEvents.map((event, index) => (
-          <div key={index} className="text-xs text-blue-500 truncate">
+          <div key={index} className="text-xs text-[#DA4735] truncate">
             {event.title}
           </div>
         ))}
@@ -67,6 +55,7 @@ const Home = () => {
     );
   };
 
+  // Navigation functions remain unchanged
   const changeMonth = (offset) => {
     const newDate = new Date(selectedDate);
     newDate.setMonth(newDate.getMonth() + offset);
@@ -91,9 +80,16 @@ const Home = () => {
     setSelectedDate(newDate);
   };
 
+  const changeWorkWeek = (offset) => {
+    const newDate = new Date(selectedDate);
+    newDate.setDate(newDate.getDate() + offset * 7);
+    setSelectedDate(newDate);
+  };
+
   const actions = {
     Day: changeDay,
     Week: changeWeek,
+    "Work Week": changeWorkWeek,
     Month: changeMonth,
     Year: changeYear,
   };
@@ -171,12 +167,12 @@ const Home = () => {
                     onClick={() => handleDateClick(date.day, month)}
                     className={`text-center text-sm mx-auto cursor-pointer 
                       ${date.isCurrentMonth ? "text-black" : "text-gray-300"} 
-                      hover:bg-blue-100 rounded-full w-6 h-6 flex items-center justify-center
+                      hover:bg-[#f7d9d4] rounded-full w-6 h-6 flex items-center justify-center
                       ${
                         selectedDate.getDate() === date.day &&
                         selectedDate.getMonth() === month &&
                         date.isCurrentMonth
-                          ? "bg-blue-500 text-white"
+                          ? "bg-[#DA4735] text-white"
                           : ""
                       }`}
                   >
@@ -266,10 +262,10 @@ const Home = () => {
               key={i}
               className={`min-h-16 p-1 border rounded text-sm 
                 ${date.isCurrentMonth ? "text-black" : "text-gray-400"} 
-                hover:bg-blue-50 
+                hover:bg-[#f7d9d4]
                 ${
                   selectedDate.getDate() === date.day && date.isCurrentMonth
-                    ? "bg-blue-100 border-blue-300"
+                    ? "bg-[#DA4735] border-[#DA4735] text-white"
                     : ""
                 }`}
               onClick={() => date.isCurrentMonth && handleDateClick(date.day)}
@@ -284,7 +280,70 @@ const Home = () => {
       </div>
     );
   };
+  const renderWorkWeekView = () => {
+    const startOfWeek = new Date(selectedDate);
+    // Adjust to Monday (if Sunday, go back 6 days; otherwise go to previous Monday)
+    const dayOfWeek = startOfWeek.getDay();
+    const diff = dayOfWeek === 0 ? 6 : dayOfWeek - 1; // How many days to subtract to get to Monday
+    startOfWeek.setDate(startOfWeek.getDate() - diff);
 
+    // Only show Monday to Friday (5 days)
+    const days = Array.from({ length: 5 }, (_, i) => {
+      const day = new Date(startOfWeek);
+      day.setDate(startOfWeek.getDate() + i);
+      return day;
+    });
+
+    return (
+      <div className="grid grid-cols-6 border-t border-l">
+        <div className="border-b border-r p-1"></div>
+        {days.map((day) => (
+          <div
+            key={day.toDateString()}
+            className="border-b border-r p-2 text-center"
+          >
+            <div className="text-sm text-gray-600">
+              {day.toLocaleDateString("default", { weekday: "short" })}
+            </div>
+            <div
+              className={`text-lg 
+              ${
+                day.getDate() === selectedDate.getDate()
+                  ? "bg-[#DA4735] text-white rounded-full w-8 h-8 flex items-center justify-center mx-auto"
+                  : ""
+              }`}
+            >
+              {day.getDate()}
+            </div>
+          </div>
+        ))}
+
+        {Array.from({ length: 24 }).map((_, i) => (
+          <React.Fragment key={i}>
+            <div className="border-b border-r p-1 text-right text-xs text-gray-500 pr-2">
+              {i}:00
+            </div>
+            {days.map((day) => {
+              const hourDate = new Date(day);
+              hourDate.setHours(i);
+              return (
+                <div
+                  key={`${i}-${day.getDay()}`}
+                  className="border-b border-r h-12 hover:bg-[#f7d9d4] cursor-pointer relative"
+                  onClick={() => {
+                    setSelectedDate(hourDate);
+                    setView("Day");
+                  }}
+                >
+                  {renderEvents(hourDate)}
+                </div>
+              );
+            })}
+          </React.Fragment>
+        ))}
+      </div>
+    );
+  };
   const renderWeekView = () => {
     const startOfWeek = new Date(selectedDate);
     startOfWeek.setDate(selectedDate.getDate() - selectedDate.getDay() + 1);
@@ -310,7 +369,7 @@ const Home = () => {
               className={`text-lg 
               ${
                 day.getDate() === selectedDate.getDate()
-                  ? "bg-blue-500 text-white rounded-full w-8 h-8 flex items-center justify-center mx-auto"
+                  ? "bg-[#DA4735] text-white rounded-full w-8 h-8 flex items-center justify-center mx-auto"
                   : ""
               }`}
             >
@@ -330,7 +389,7 @@ const Home = () => {
               return (
                 <div
                   key={`${i}-${day.getDay()}`}
-                  className="border-b border-r h-12 hover:bg-blue-50 cursor-pointer relative"
+                  className="border-b border-r h-12 hover:bg-[#f7d9d4] cursor-pointer relative"
                   onClick={() => {
                     setSelectedDate(hourDate);
                     setView("Day");
@@ -360,7 +419,7 @@ const Home = () => {
             <div
               key={i}
               className={`p-4 flex items-start ${
-                isCurrentHour ? "bg-blue-50" : ""
+                isCurrentHour ? "bg-[#f7d9d4]" : ""
               }`}
             >
               <div className="w-16 text-right pr-2 text-gray-500">
@@ -377,18 +436,18 @@ const Home = () => {
   };
 
   return (
-    <div className="max-w-6xl mx-auto p-4">
+    <div className="w-full p-4 h-full">
       <div className="flex justify-between items-center mb-4">
         <div className="flex space-x-4">
           <button
             onClick={() => actions[view](-1)}
-            className="p-2 rounded-full hover:bg-gray-100"
+            className="p-2 rounded-full hover:bg-[#f7d9d4] text-[#DA4735]"
           >
             <FaChevronLeft />
           </button>
           <button
             onClick={() => actions[view](1)}
-            className="p-2 rounded-full hover:bg-gray-100"
+            className="p-2 rounded-full hover:bg-[#f7d9d4] text-[#DA4735]"
           >
             <FaChevronRight />
           </button>
@@ -415,16 +474,16 @@ const Home = () => {
             })}
         </div>
         <div className="flex space-x-2">
-          {["Day", "Week", "Month", "Year"].map((v) => (
+          {["Day", "Week", "Work Week", "Month", "Year"].map((v) => (
             <button
               key={v}
               onClick={() => setView(v)}
               className={`px-3 py-1 rounded-md text-sm 
-                ${
-                  view === v
-                    ? "bg-blue-500 text-white"
-                    : "bg-gray-100 hover:bg-gray-200"
-                }`}
+      ${
+        view === v
+          ? "bg-[#DA4735] text-black "
+          : "bg-black-100 hover:bg-black-200"
+      }`}
             >
               {v}
             </button>
@@ -432,16 +491,17 @@ const Home = () => {
         </div>
       </div>
 
-      <div className="bg-white rounded-lg shadow overflow-hidden">
+      <div className="bg-white rounded-lg shadow-lg overflow-hidden">
         {events && events.length > 0 ? (
           <>
             {view === "Year" && renderYearView()}
             {view === "Month" && renderMonthView()}
+            {view === "Work Week" && renderWorkWeekView()}
             {view === "Week" && renderWeekView()}
             {view === "Day" && renderDayView()}
           </>
         ) : (
-          <div>No events to display</div>
+          <div className="p-4 text-gray-600">No events to display</div>
         )}
       </div>
     </div>
