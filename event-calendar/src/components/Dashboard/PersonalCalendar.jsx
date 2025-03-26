@@ -241,7 +241,7 @@ const Home = () => {
         {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((day) => (
           <div
             key={day}
-            className="text-sm font-semibold text-gray-600 text-center pb-2"
+            className="text-sm font-semibold text-black-600 text-center pb-2"
           >
             {day}
           </div>
@@ -261,11 +261,11 @@ const Home = () => {
             <div
               key={i}
               className={`min-h-16 p-1 border rounded text-sm 
-                ${date.isCurrentMonth ? "text-black" : "text-gray-400"} 
+                ${date.isCurrentMonth ? "text-black" : "text-black"} 
                 hover:bg-[#f7d9d4]
                 ${
                   selectedDate.getDate() === date.day && date.isCurrentMonth
-                    ? "bg-[#DA4735] border-[#DA4735] text-white"
+                    ? "bg-[#DA4735] border-[#DA4735] text-black"
                     : ""
                 }`}
               onClick={() => date.isCurrentMonth && handleDateClick(date.day)}
@@ -310,7 +310,7 @@ const Home = () => {
               ${
                 day.getDate() === selectedDate.getDate()
                   ? "bg-[#DA4735] text-white rounded-full w-8 h-8 flex items-center justify-center mx-auto"
-                  : ""
+                  : "text-black"
               }`}
             >
               {day.getDate()}
@@ -370,7 +370,7 @@ const Home = () => {
               ${
                 day.getDate() === selectedDate.getDate()
                   ? "bg-[#DA4735] text-white rounded-full w-8 h-8 flex items-center justify-center mx-auto"
-                  : ""
+                  : "text-black"
               }`}
             >
               {day.getDate()}
@@ -436,7 +436,7 @@ const Home = () => {
   };
 
   return (
-    <div className="w-full p-4 h-full">
+    <div className="w-full p-10 h-full flex flex-col justify-center">
       <div className="flex justify-between items-center mb-4">
         <div className="flex space-x-4">
           <button
@@ -482,7 +482,7 @@ const Home = () => {
       ${
         view === v
           ? "bg-[#DA4735] text-black "
-          : "bg-black-100 hover:bg-black-200"
+          : "bg-black-100 hover:bg-black+200 text-gray-600"
       }`}
             >
               {v}
