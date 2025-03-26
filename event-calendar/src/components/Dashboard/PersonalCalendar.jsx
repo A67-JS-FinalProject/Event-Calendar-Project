@@ -436,7 +436,7 @@ const Home = () => {
   };
 
   return (
-    <div className="w-full p-10 h-full flex flex-col justify-center">
+    <div className="w-full p-10 h-fit flex flex-col  ">
       <div className="flex justify-between items-center mb-4">
         <div className="flex space-x-4">
           <button
