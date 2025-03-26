@@ -37,11 +37,16 @@ export default function NavBarPublic() {
         const results = events
             .filter(event => event.title.toLowerCase().includes(search.toLowerCase()))
             .filter(event => event.startDate && new Date(event.startDate) >= currentDate)
-            .filter(event => event.isPublic === true)
-            .find(event => event.isRecurring === true); 
+            .filter(event => event.isPublic === true);
     
-            setFilteredEvents(results ? [results] : []);
-        console.log("Search Results:", results);
+        // Find the first recurring event after today
+        const firstRecurringEvent = results.find(event => event.isRecurring === true);
+    
+        // Combine the first recurring event (if found) with the rest of the results
+        const nonRecurringEvents = results.filter(event => event.isRecurring === false);
+    
+        setFilteredEvents(firstRecurringEvent ? [firstRecurringEvent, ...nonRecurringEvents] : nonRecurringEvents);
+        console.log("Search Results:", { firstRecurringEvent, nonRecurringEvents });
     }, [search, events]);
 
     return (
@@ -71,11 +76,21 @@ export default function NavBarPublic() {
                 {filteredEvents.length > 0 && (
                     <ul className="absolute top-12 left-0 w-full bg-white shadow-md rounded-md mt-1">
                         {filteredEvents.map((event) => (
-                            <li key={event._id} className="px-4 py-2 hover:bg-gray-200">
-                                <Link to={`/events/${event._id}`}>{event.title}</Link>
+                            <Link to={`/events/${event._id}`} key={event._id}>
+                            <li className="px-4 py-2 hover:bg-gray-200">
+                                
+                                <div className="avatar">
+                                    <div className="w-8 rounded">
+                                        <img
+                                            src={event.eventCover}
+                                            alt="Tailwind-CSS-Avatar-component" />
+                                    </div>
+                                </div>
+                                <p>{event.title}</p>
+                                <p>{new Date(event.startDate).toLocaleString()}</p>
                             </li>
+                            </Link>
                         ))}
-                        
                     </ul>
                 )}
             </div>
