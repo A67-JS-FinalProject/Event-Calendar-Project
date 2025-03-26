@@ -7,6 +7,8 @@ import { FaClock } from "react-icons/fa6";
 import { AppContext } from "../../store/app.context";
 import ManageParticipants from '../Events/ManageParticipants';
 import InviteFromContactList from '../Events/InviteFromContactList';
+import NavBarPrivate from "../NavBarPrivate/NavBarPrivate";
+import NavBarPublic from "../NavBarPublic/NavBarPublic";
 
 function RenderEvent() {
   const { id } = useParams();
