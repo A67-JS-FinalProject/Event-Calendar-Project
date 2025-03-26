@@ -18,13 +18,13 @@ const UserDashboard = () => {
             </h1>
           </header>
 
-          <div className="grid grid-rows-2 lg:grid-rows-2 ">
+          <div className="grid grid-rows-1 lg:grid-rows-1 ">
             {activeSection === "calendar" ? (
               <>
-                <div className="lg:col-span-2">
-                  <PersonalCalendar className="w-full h-full border border-gray-200 rounded-lg shadow-sm" />
+                <div className=" h-fit">
+                  <PersonalCalendar className="w-full w-fit border border-gray-200 rounded-lg shadow-sm" />
                 </div>
-                <div className="flex row space-x-6">
+                <div className="flex row space-x-6 p-10">
                   <EventManager className="w-full h-full border border-gray-200 rounded-lg shadow-sm" />
                   <EventInvitationsList className="border border-gray-200 rounded-lg shadow-sm p-4 bg-white" />
                 </div>

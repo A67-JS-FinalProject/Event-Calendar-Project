@@ -2,7 +2,7 @@ import { useState, useContext, useEffect } from "react";
 import { createEvent } from "../../services/eventService";
 import { AppContext } from "../../store/app.context";
 import { getUserByEmail, updateUserEvent } from "../../services/usersService";
-import { getContactLists } from '../../services/contactListsService';
+import { getContactLists } from "../../services/contactListsService";
 import { useNavigate } from "react-router-dom";
 import PropTypes from "prop-types";
 
@@ -51,14 +51,14 @@ function CreateAnEvent({ isOpen, onRequestClose }) {
     description: "",
   });
   const [contactLists, setContactLists] = useState([]);
-  const [selectedContactList, setSelectedContactList] = useState('');
+  const [selectedContactList, setSelectedContactList] = useState("");
   const { appState, setAppState } = useContext(AppContext);
   const { user, token } = appState;
   const navigate = useNavigate();
-  
+
   const [participantPermissions, setParticipantPermissions] = useState({
     canInviteOthers: false,
-    canViewGuestList: true
+    canViewGuestList: true,
   });
 
   useEffect(() => {
@@ -80,7 +80,7 @@ function CreateAnEvent({ isOpen, onRequestClose }) {
           const lists = await getContactLists(user);
           setContactLists(lists);
         } catch (error) {
-          console.error('Error fetching contact lists:', error);
+          console.error("Error fetching contact lists:", error);
         }
       }
     };
@@ -89,15 +89,17 @@ function CreateAnEvent({ isOpen, onRequestClose }) {
   }, [user]);
 
   const handleContactListSelect = async (listName) => {
-    setSelectedContactList(listName); 
-    const selectedList = contactLists.find(list => list.name === listName);
-    if (selectedList){
-      const participantEmails = selectedList.users.join(', ');
-      setParticipants(prevParticipants => {
-        const currentEmails = prevParticipants ? prevParticipants.split(',').map(p => p.trim()) : [];
-        const newEmails = participantEmails.split(',').map(p => p.trim());
+    setSelectedContactList(listName);
+    const selectedList = contactLists.find((list) => list.name === listName);
+    if (selectedList) {
+      const participantEmails = selectedList.users.join(", ");
+      setParticipants((prevParticipants) => {
+        const currentEmails = prevParticipants
+          ? prevParticipants.split(",").map((p) => p.trim())
+          : [];
+        const newEmails = participantEmails.split(",").map((p) => p.trim());
         const uniqueEmails = [...new Set([...currentEmails, ...newEmails])];
-        return uniqueEmails.join(', ');
+        return uniqueEmails.join(", ");
       });
     }
   };
@@ -163,29 +165,31 @@ function CreateAnEvent({ isOpen, onRequestClose }) {
     if (participants) {
       const emails = participants.split(",").map((email) => email.trim());
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      
+
       const invalidEmails = emails.filter((email) => !emailRegex.test(email));
       if (invalidEmails.length > 0) {
-          newErrors.participants = `Invalid email(s): ${invalidEmails.join(", ")}`;
-          valid = false;
+        newErrors.participants = `Invalid email(s): ${invalidEmails.join(
+          ", "
+        )}`;
+        valid = false;
       }
 
       try {
-          const checkOptedOut = async () => {
-              for (const email of emails) {
-                  const userData = await getUserByEmail(email, token);
-                  if (userData?.optOutOfInvitations) {
-                      newErrors.participants = `${email} has opted out of receiving invitations`;
-                      valid = false;
-                      break;
-                  }
-              }
-          };
-          await checkOptedOut();
+        const checkOptedOut = async () => {
+          for (const email of emails) {
+            const userData = await getUserByEmail(email, token);
+            if (userData?.optOutOfInvitations) {
+              newErrors.participants = `${email} has opted out of receiving invitations`;
+              valid = false;
+              break;
+            }
+          }
+        };
+        await checkOptedOut();
       } catch (error) {
-          console.error("Error checking opted-out status:", error);
-          newErrors.participants = "Error validating participant preferences";
-          valid = false;
+        console.error("Error checking opted-out status:", error);
+        newErrors.participants = "Error validating participant preferences";
+        valid = false;
       }
     }
 
@@ -202,7 +206,7 @@ function CreateAnEvent({ isOpen, onRequestClose }) {
       return;
     }
 
-    if (!await validateFields()) {
+    if (!(await validateFields())) {
       return;
     }
 
@@ -378,10 +382,12 @@ function CreateAnEvent({ isOpen, onRequestClose }) {
           <input
             type="checkbox"
             checked={participantPermissions.canInviteOthers}
-            onChange={(e) => setParticipantPermissions(prev => ({
-              ...prev,
-              canInviteOthers: e.target.checked
-            }))}
+            onChange={(e) =>
+              setParticipantPermissions((prev) => ({
+                ...prev,
+                canInviteOthers: e.target.checked,
+              }))
+            }
             className="mr-2"
           />
           Participants can invite others
@@ -390,10 +396,12 @@ function CreateAnEvent({ isOpen, onRequestClose }) {
           <input
             type="checkbox"
             checked={participantPermissions.canViewGuestList}
-            onChange={(e) => setParticipantPermissions(prev => ({
-              ...prev,
-              canViewGuestList: e.target.checked
-            }))}
+            onChange={(e) =>
+              setParticipantPermissions((prev) => ({
+                ...prev,
+                canViewGuestList: e.target.checked,
+              }))
+            }
             className="mr-2"
           />
           Participants can view guest list
@@ -514,9 +522,9 @@ function CreateAnEvent({ isOpen, onRequestClose }) {
                         }}
                       >
                         <option value="does_not_repeat">Does not repeat</option>
-                        <option value="weekly">Weekly on given day</option>
-                        <option value="monthly">Monthly on given day</option>
-                        <option value="yearly">Yearly on given day</option>
+                        <option value="weekly">Weekly </option>
+                        <option value="monthly">Monthly </option>
+                        <option value="yearly">Yearly </option>
                         <option value="custom">Custom</option>
                       </select>
                     </div>
@@ -554,32 +562,32 @@ function CreateAnEvent({ isOpen, onRequestClose }) {
           </div>
 
           <div className="form-control mb-4 flex flex-row items-center space-x-6 px-6">
-  <div>
-    <MdPeopleAlt className="text-2xl" />
-  </div>
-  <div className="flex flex-col w-full gap-2">
-    <input
-      value={participants}
-      onChange={(e) => setParticipants(e.target.value)}
-      placeholder="Add participants"
-      className="input w-full border-0 border-b-2 border-gray-300 focus:outline-none 
+            <div>
+              <MdPeopleAlt className="text-2xl" />
+            </div>
+            <div className="flex flex-col w-full gap-2">
+              <input
+                value={participants}
+                onChange={(e) => setParticipants(e.target.value)}
+                placeholder="Add participants"
+                className="input w-full border-0 border-b-2 border-gray-300 focus:outline-none 
       focus:border-b-4 focus:border-blue-500 focus:bg-pink-300 
       focus:text-blue-100 focus:opacity-100 transition-all"
-    />
-    <select
-      value={selectedContactList}
-      onChange={(e) => handleContactListSelect(e.target.value)}
-      className="select select-bordered w-full"
-    >
-      <option value="">Select from contact lists</option>
-      {contactLists.map(list => (
-        <option key={list.name} value={list.name}>
-          {list.name} ({list.users?.length || 0} contacts)
-        </option>
-      ))}
-    </select>
-  </div>
-</div>
+              />
+              <select
+                value={selectedContactList}
+                onChange={(e) => handleContactListSelect(e.target.value)}
+                className="select select-bordered w-full"
+              >
+                <option value="">Select from contact lists</option>
+                {contactLists.map((list) => (
+                  <option key={list.name} value={list.name}>
+                    {list.name} ({list.users?.length || 0} contacts)
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
           {errors.participants && (
             <span
               style={{
@@ -735,7 +743,7 @@ function CreateAnEvent({ isOpen, onRequestClose }) {
               ))}
             </div>
             <PermissionsManager />
-          <button
+            <button
               type="button"
               onClick={createAReminder}
               className="btn btn-ghost btn-block"
