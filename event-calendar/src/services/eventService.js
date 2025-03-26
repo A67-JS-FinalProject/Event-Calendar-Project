@@ -133,9 +133,7 @@ export const getEventsInRange = async (eventId, startDate, endDate, token) => {
   );
   return response.data;
 };
-/**
- * @Atanas Zaykov
- */
+
 export const getUserEvents = async (userId, token) => {
   try {
     const response = await fetch(`${URL}/events/user/${userId}`, {
@@ -193,28 +191,27 @@ export const getEventsByDateRange = async (startDate, endDate, token) => {
 
 export const updateEventParticipants = async (eventId, participants, token) => {
   try {
-    // Validate eventId
     if (!eventId || typeof eventId !== 'string') {
-      throw new Error('Invalid event ID format');
+      throw new Error('Invalid event ID');
     }
 
-    // Validate participants array
-    if (!Array.isArray(participants)) {
-      throw new Error('Participants must be an array');
-    }
+    // Add debug logging
+    console.log('Making request to:', `${URL}/events/${eventId}`);
+    console.log('Payload:', { participants });
 
-    const response = await fetch(`${URL}/events/${eventId}/participants`, {
-      method: "PATCH",
+    const response = await fetch(`${URL}/events/${eventId}`, {
+      method: 'PUT', // Changed from PATCH to PUT
       headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
       },
-      body: JSON.stringify({ participants }),
+      body: JSON.stringify({ participants })
     });
 
     if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || 'Failed to update participants');
+      const errorText = await response.text();
+      console.error('Server response:', errorText);
+      throw new Error(`Server responded with ${response.status}: ${errorText}`);
     }
 
     const data = await response.json();

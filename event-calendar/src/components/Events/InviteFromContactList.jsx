@@ -9,8 +9,7 @@ function InviteFromContactList({ eventId, currentParticipants, onUpdate }) {
   const [isOpen, setIsOpen] = useState(false);
   const [contactLists, setContactLists] = useState([]);
   const [selectedList, setSelectedList] = useState('');
-  const [participants, setParticipants] = useState('');
-  const [selectedContactList, setSelectedContactList] = useState('');
+  const [selectedUsers, setSelectedUsers] = useState([]);
   const { appState } = useContext(AppContext);
 
   const handleOpen = async () => {
@@ -23,43 +22,73 @@ function InviteFromContactList({ eventId, currentParticipants, onUpdate }) {
     }
   };
 
+  const handleListChange = (e) => {
+    const listName = e.target.value;
+    setSelectedList(listName);
+    setSelectedUsers([]);
+  };
+
+  const handleUserSelect = (email) => {
+    setSelectedUsers(prev => 
+      prev.includes(email) 
+        ? prev.filter(e => e !== email)
+        : [...prev, email]
+    );
+  };
+
   const handleInvite = async () => {
-    if (!selectedList || !eventId) {
+    if (!selectedList || !eventId || selectedUsers.length === 0) {
       console.error('Missing required data');
       return;
     }
 
-    const selectedContacts = contactLists.find(list => list.name === selectedList);
-    if (!selectedContacts) return;
-
-    const currentEmails = currentParticipants.map(p => p.email);
-    const newParticipants = selectedContacts.users
-      .filter(email => !currentEmails.includes(email))
-      .map(email => ({
-        email,
-        status: 'pending',
-        role: 'invitee',
-        permissions: {
-          canInviteOthers: false,
-          canViewGuestList: true
-        }
-      }));
-
-    const updatedParticipants = [...currentParticipants, ...newParticipants];
-
     try {
-      await updateEventParticipants(eventId, updatedParticipants, appState.token);
-      onUpdate(updatedParticipants);
-      setIsOpen(false);
-      setSelectedList('');
-      setParticipants('');
+      // Format participants data according to API requirements
+      const currentEmails = currentParticipants.map(p => p.email);
+      const newParticipants = selectedUsers
+        .filter(email => !currentEmails.includes(email))
+        .map(email => ({
+          email,
+          status: 'pending',
+          role: 'invitee',
+          permissions: {
+            canInviteOthers: false,
+            canViewGuestList: true
+          }
+        }));
+
+      if (newParticipants.length === 0) {
+        console.log('No new participants to add');
+        return;
+      }
+
+      const updatedParticipants = [...currentParticipants, ...newParticipants];
+
+      // Add more detailed logging
+      console.log('Current participants:', currentParticipants);
+      console.log('New participants:', newParticipants);
+      console.log('Updated participants:', updatedParticipants);
+
+      console.log('Sending request with:', {
+        eventId,
+        token: appState.token ? 'present' : 'missing',
+        participantsCount: updatedParticipants.length
+      });
+
+      const result = await updateEventParticipants(eventId, updatedParticipants, appState.token);
+      
+      if (result) {
+        console.log('Successfully updated participants:', result);
+        onUpdate(result.participants || updatedParticipants);
+        setIsOpen(false);
+        setSelectedList('');
+        setSelectedUsers([]);
+      }
     } catch (error) {
       console.error('Error inviting participants:', error);
+      const errorMessage = error.message || 'Failed to invite participants. Please try again.';
+      alert(errorMessage);
     }
-  };
-
-  const handleContactListSelect = (value) => {
-    setSelectedContactList(value);
   };
 
   return (
@@ -78,7 +107,7 @@ function InviteFromContactList({ eventId, currentParticipants, onUpdate }) {
             <select
               className="w-full p-2 border rounded mb-4 dark:bg-gray-700 dark:border-gray-600"
               value={selectedList}
-              onChange={(e) => setSelectedList(e.target.value)}
+              onChange={handleListChange}
             >
               <option value="">Choose a list</option>
               {contactLists.map(list => (
@@ -87,34 +116,26 @@ function InviteFromContactList({ eventId, currentParticipants, onUpdate }) {
                 </option>
               ))}
             </select>
-            <div className="form-control mb-4 flex flex-row items-center space-x-6 px-6">
-              <div>
-                <MdPeopleAlt className="text-2xl" />
-              </div>
-              <div className="flex flex-col w-full gap-2">
-                <input
-                  value={participants}
-                  onChange={(e) => setParticipants(e.target.value)}
-                  placeholder="Add participants"
-                  className="input w-full border-0 border-b-2 border-gray-300 focus:outline-none 
-                  focus:border-b-4 focus:border-blue-500 focus:bg-pink-300 
-                  focus:text-blue-100 focus:opacity-100 transition-all"
-                />
-                
-                <select
-                  value={selectedContactList}
-                  onChange={(e) => handleContactListSelect(e.target.value)}
-                  className="select select-bordered w-full"
-                >
-                  <option value="">Select from contact lists</option>
-                  {contactLists.map(list => (
-                    <option key={list.name} value={list.name}>
-                      {list.name} ({list.users?.length || 0} contacts)
-                    </option>
+
+            {selectedList && (
+              <div className="mb-4 max-h-60 overflow-y-auto">
+                {contactLists
+                  .find(list => list.name === selectedList)
+                  ?.users.map(email => (
+                    <div key={email} className="flex items-center gap-2 p-2">
+                      <input
+                        type="checkbox"
+                        id={email}
+                        checked={selectedUsers.includes(email)}
+                        onChange={() => handleUserSelect(email)}
+                        className="checkbox"
+                      />
+                      <label htmlFor={email}>{email}</label>
+                    </div>
                   ))}
-                </select>
               </div>
-            </div>
+            )}
+
             <div className="flex justify-end gap-2">
               <button
                 onClick={() => setIsOpen(false)}
@@ -125,9 +146,9 @@ function InviteFromContactList({ eventId, currentParticipants, onUpdate }) {
               <button
                 onClick={handleInvite}
                 className="btn btn-primary"
-                disabled={!selectedList}
+                disabled={!selectedList || selectedUsers.length === 0}
               >
-                Invite
+                Invite ({selectedUsers.length})
               </button>
             </div>
           </div>
@@ -136,6 +157,7 @@ function InviteFromContactList({ eventId, currentParticipants, onUpdate }) {
     </div>
   );
 }
+
 InviteFromContactList.propTypes = {
   eventId: PropTypes.string.isRequired,
   currentParticipants: PropTypes.arrayOf(
