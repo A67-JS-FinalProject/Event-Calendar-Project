@@ -1,37 +1,42 @@
-import { useState, useEffect, useContext } from 'react';
-import { AppContext } from '../../store/app.context';
-import EventInvitation from './EventInvitation';
+import { useState, useEffect, useContext } from "react";
+import { AppContext } from "../../store/app.context";
+import EventInvitation from "./EventInvitation";
 
 function EventInvitationsList() {
   const [invitations, setInvitations] = useState([]);
   const { appState } = useContext(AppContext);
-  
+
   const fetchInvitations = async () => {
     try {
       const response = await fetch(`http://localhost:3000/events`, {
         headers: {
-          'Authorization': `Bearer ${appState.token}`
-        }
+          Authorization: `Bearer ${appState.token}`,
+        },
       });
       const data = await response.json();
-      
-      const userInvitations = data.filter(event => 
-        event.participants.some(p => 
-          p.email === appState.user && 
-          p.role === 'invitee' && 
-          p.status === 'pending'
+
+      const userInvitations = data
+        .filter((event) =>
+          event.participants.some(
+            (p) =>
+              p.email === appState.user &&
+              p.role === "invitee" &&
+              p.status === "pending"
+          )
         )
-      ).map(event => ({
-        id: event._id,
-        eventTitle: event.title,
-        eventDate: event.startDate,
-        senderName: `${event.createdBy.firstName} ${event.createdBy.lastName}`,
-        status: event.participants.find(p => p.email === appState.user)?.status || 'pending'
-      }));
+        .map((event) => ({
+          id: event._id,
+          eventTitle: event.title,
+          eventDate: event.startDate,
+          senderName: `${event.createdBy.firstName} ${event.createdBy.lastName}`,
+          status:
+            event.participants.find((p) => p.email === appState.user)?.status ||
+            "pending",
+        }));
 
       setInvitations(userInvitations);
     } catch (error) {
-      console.error('Error fetching invitations:', error);
+      console.error("Error fetching invitations:", error);
     }
   };
 
@@ -44,17 +49,17 @@ function EventInvitationsList() {
   const handleResponseSubmit = async (invitationId, response) => {
     try {
       await fetch(`http://localhost:3000/events/invitations/${invitationId}`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${appState.token}`
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${appState.token}`,
         },
-        body: JSON.stringify({ response })
+        body: JSON.stringify({ response }),
       });
 
       fetchInvitations();
     } catch (error) {
-      console.error('Error updating invitation:', error);
+      console.error("Error updating invitation:", error);
     }
   };
 
@@ -63,18 +68,20 @@ function EventInvitationsList() {
   }
 
   return (
-    <div className="p-6">
-      <h2 className="text-2xl font-bold mb-4">Event Invitations</h2>
+    <div className="p-6 bg-white rounded-lg shadow-md w-full h-65 overflow-y-auto">
+      <h2 className="text-2xl font-bold mb-4 text-black">Event Invitations</h2>
       {invitations.length === 0 ? (
-        <p className="text-gray-500">No pending invitations</p>
+        <p className=" text-black ">No pending invitations</p>
       ) : (
         <div className="space-y-4">
-          {invitations.map(invitation => (
+          {invitations.map((invitation) => (
             <EventInvitation
               key={invitation.id}
               invitation={invitation}
               currentUser={appState.user}
-              onResponseSubmit={(response) => handleResponseSubmit(invitation.id, response)}
+              onResponseSubmit={(response) =>
+                handleResponseSubmit(invitation.id, response)
+              }
             />
           ))}
         </div>
