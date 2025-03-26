@@ -219,7 +219,7 @@ function LandingPage() {
                 className="bg-white p-8 rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300 text-center"
               >
                 <div className="w-32 h-32 bg-gray-200 rounded-full mx-auto mb-6 overflow-hidden">
-                  <div className="w-full h-full bg-[#DA4735] opacity-20 flex items-center justify-center">
+                  <div className="w-full h-full bg-black opacity-20 flex items-center justify-center">
                     <span className="text-4xl text-[#DA4735] font-bold">
                       {member.name.charAt(0)}
                     </span>
