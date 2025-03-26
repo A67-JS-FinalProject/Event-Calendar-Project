@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { getContactLists, deleteContactList } from "../../services/contactListsService";
 import { auth } from "../../config/firebaseConfig";
 import { useNavigate } from "react-router-dom";
+import NavBarPrivate from "../NavBarPrivate/NavBarPrivate";
 
 function ContactList() {
     const [isModalOpen, setModalOpen] = useState(false);
@@ -52,6 +53,9 @@ function ContactList() {
     }
 
     return (
+
+        <>
+        <NavBarPrivate/>
         <div>
             <h1 className="text-2xl font-bold mb-4 mt-6 text-center">Contact List</h1>
 
@@ -92,6 +96,8 @@ function ContactList() {
                 onListAdded={() => fetchContactLists()}
             />
         </div>
+        </>
+        
     );
 }
 

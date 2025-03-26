@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { getUserByEmail, updateUserProfile } from "../../services/usersService";
 import { auth } from "../../config/firebaseConfig";
 import axios from "axios";
+import NavBarPrivate from "../NavBarPrivate/NavBarPrivate";
 
 function Details() {
     const [user, setUser] = useState(null);
@@ -123,6 +124,8 @@ function Details() {
         );
 
     return (
+        <>
+        <NavBarPrivate/>
         <div className="max-w-md mx-auto mt-8 p-6 border border-gray-300 rounded-lg shadow-lg bg-white mb-8">
             <h2 className="text-2xl font-bold mb-6 text-center">Profile Details</h2>
             <form onSubmit={handleSubmit}>
@@ -186,6 +189,7 @@ function Details() {
                 </button>
             </form>
         </div>
+        </>
     );
 }
 

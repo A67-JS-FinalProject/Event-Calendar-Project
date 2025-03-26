@@ -5,6 +5,7 @@ import { auth } from "../../config/firebaseConfig";
 import { getUserByEmail } from "../../services/usersService";
 import { deleteSingleContact } from "../../services/contactListsService";
 import AddContact from "./AddContact";
+import NavBarPrivate from "../NavBarPrivate/NavBarPrivate";
 
 function SingleContactView() {
     const { listName } = useParams();
@@ -99,6 +100,8 @@ function SingleContactView() {
     }
 
     return (
+        <>
+        <NavBarPrivate/>
         <div>
             <h1 className="text-2xl font-bold mb-6 mt-6 text-center">Contacts in {listName}</h1>
             <div className="flex justify-end">
@@ -147,6 +150,8 @@ function SingleContactView() {
                 onAddParticipant={handleAddParticipant}
                 />
         </div>
+        </>
+        
     );
 }
 

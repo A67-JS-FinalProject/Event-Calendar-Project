@@ -1,22 +1,14 @@
 import { useContext, useEffect, useState } from "react";
 import React from "react";
-import { useNavigate } from "react-router-dom";
-import { FaChevronLeft } from "react-icons/fa";
-import { FaChevronRight } from "react-icons/fa";
-import { RxHamburgerMenu } from "react-icons/rx";
-import { GoTriangleDown } from "react-icons/go";
-import { FaRegCalendarAlt } from "react-icons/fa";
-import { LuListTodo } from "react-icons/lu";
 import { FaPlus } from "react-icons/fa";
 import CreateAnEvent from "../CreateAEvent/CreateAnEvent";
 import { AppContext } from "../../store/app.context";
 import { getUserByEmail } from "../../services/usersService";
-import logo from "../../assets/logo.png";
+import NavBarPrivate from "../NavBarPrivate/NavBarPrivate";
 
 const Home = () => {
   const { appState } = useContext(AppContext);
 
-  const navigate = useNavigate();
   const [view, setView] = useState("Year");
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [isOpen, setIsOpen] = useState(true);
@@ -293,125 +285,9 @@ const Home = () => {
 
   return (
     <>
-      <nav className="bg-gray-800 text-white p-4 flex items-center justify-between">
-        {/* Left: Hamburger + Logo + Navigation */}
-        <div className="flex items-center gap-4">
-          <button className="btn btn-ghost" onClick={() => setIsOpen(!isOpen)}>
-            <RxHamburgerMenu className="text-3xl" />
-          </button>
-          <img src={logo} alt="Logo" className="h-8" />
-
-          {actions[view] && (
-            <ul className="flex items-center gap-2">
-              {[-1, 1].map((dir) => (
-                <li key={dir}>
-                  <button
-                    className=" p-3 hover:bg-gray-600 hover:rounded-full hover:scale-105 transition duration-300"
-                    onClick={() => actions[view](dir)}
-                  >
-                    {dir === -1 ? <FaChevronLeft /> : <FaChevronRight />}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          )}
-          {/* Display Selected Date */}
-          <div className="text-lg font-semibold">
-            {view === "Year" &&
-              selectedDate.toLocaleDateString("default", {
-                year: "numeric",
-              })}
-            {view === "Month" &&
-              selectedDate.toLocaleDateString("default", {
-                year: "numeric",
-                month: "long",
-              })}
-            {view === "Week" &&
-              selectedDate.toLocaleDateString("default", {
-                month: "long",
-                year: "numeric",
-              })}
-            {view === "Day" &&
-              selectedDate.toLocaleDateString("default", {
-                month: "long",
-                day: "numeric",
-                year: "numeric",
-              })}
-          </div>
-        </div>
-
-        {/* Right: Dropdowns & Icons */}
-        <div className="flex items-center gap-4">
-          {/* View Selection Dropdown */}
-          <details className="dropdown border-2 divide-x rounded-full p-1">
-            <summary className="btn btn-ghost rounded-full flex items-center">
-              {view} <GoTriangleDown className="ml-2" />
-            </summary>
-            <ul className="menu m-3 dropdown-content bg-base-100 rounded-box shadow-lg z-10 w-52 p-2">
-              {["Day", "Week", "Month", "Year"].map((v) => (
-                <li key={v}>
-                  <button
-                    className="w-full text-left p-2 hover:bg-gray-600"
-                    onClick={() => setView(v)}
-                  >
-                    {v}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </details>
-          {appState.userData?.isAdmin && (
-            <li>
-              {" "}
-              <a href="/admin-dashboard" className="text-indigo-600">
-                {" "}
-                Admin Dashboard{" "}
-              </a>{" "}
-            </li>
-          )}
-          {/* Calendar & To-Do Icons */}
-          <div className="flex items-center border-2 divide-x rounded-full px-4 py-2">
-            <div className="p-2">
-              <FaRegCalendarAlt className="mr-2" />
-            </div>
-            <div className="p-2">
-              <LuListTodo className="ml-2" />
-            </div>
-          </div>
-          {/* Profile Dropdown */}
-          <details className="dropdown">
-            <summary className="btn btn-ghost rounded-full">
-              <div className="avatar">
-                <div className="w-12 rounded-full">
-                  {profilePictureURL ? (
-                    <img src={profilePictureURL} alt="User Profile" />
-                  ) : (
-                    <div className="bg-gray-400 w-full h-full flex items-center justify-center text-white">
-                      {/* Placeholder for missing profile picture */}
-                      <span className="text-sm">No Image</span>
-                    </div>
-                  )}
-                </div>
-              </div>
-              <GoTriangleDown />{" "}
-            </summary>
-            <ul className="menu dropdown-content bg-base-100 rounded-box shadow-lg z-10 w-52 p-2">
-              <li>
-                <button onClick={() => navigate("/dashboard")}>Profile</button>
-              </li>{" "}
-              <li>
-                <button onClick={() => navigate("/home/profile")}>
-                  Profile Details
-                </button>
-              </li>
-              <li>
-                <button onClick={() => navigate("/home/contact-lists")}>
-                  My Contact Lists
-                </button>
-              </li>
-            </ul>
-          </details>
-        </div>
+      <nav className="bg-gray-800 text-white p-0 flex items-center justify-between">
+        <NavBarPrivate/>
+    
       </nav>
 
       {/* Main Layout */}
