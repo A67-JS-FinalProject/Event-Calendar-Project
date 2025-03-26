@@ -16,6 +16,7 @@ import AdminRoute from "./hoc/adminRoute.jsx";
 import AdminDashboard from "./components/AdminDashboard/AdminDashboard";
 import ContactList from "./components/ContactList/ContactList";
 import SingleContactView from "./components/ContactList/SingleContactView.jsx";
+import PublicEventsView from "./components/Events/PublicEventsView.jsx";
 
 function App() {
   const [appState, setAppState] = useState({
@@ -45,6 +46,7 @@ function App() {
             }
           />
           <Route path="/events/:id" element={<RenderEvent />} />
+          <Route path="/events" element={<PublicEventsView/>} />
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
           <Route

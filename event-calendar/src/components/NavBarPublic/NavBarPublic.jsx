@@ -54,7 +54,7 @@ export default function NavBarPublic() {
             <Link to="/">
                 <img src={logo} alt="Logo" className="h-8" />
             </Link>
-            <Link to="/login" className="btn btn-error text-white px-6 py-3 text-lg rounded-full mr-6">
+            <Link to="/events" className="btn btn-error text-white px-6 bg-[#DA4735] py-3 text-lg rounded-full mr-6">
                 Events
             </Link>
             <div className="relative">
@@ -95,10 +95,10 @@ export default function NavBarPublic() {
                 )}
             </div>
             <div className="flex space-x-10">
-                <Link to="/login" className="btn btn-error text-white px-6 py-3 text-lg rounded-full">
+                <Link to="/login" className="btn bg-[#DA4735] btn-error text-white px-6 py-3 text-lg rounded-full">
                     Login
                 </Link>
-                <Link to="/register" className="btn btn-error text-white px-6 py-3 text-lg rounded-full">
+                <Link to="/register" className="btn bg-[#DA4735]  btn-error text-white px-6 py-3 text-lg rounded-full">
                     Register
                 </Link>
             </div>
