@@ -255,10 +255,15 @@ function CreateAnEvent({ isOpen, onRequestClose }) {
           ),
           location,
           description,
+          organizer: userData.email, // Add this line to set the organizer
           participants: participantEmails.map((email) => ({
             email,
             status: email === userData.email ? "accepted" : "pending",
             role: email === userData.email ? "organizer" : "invitee",
+            permissions: email === userData.email ? {
+              canInviteOthers: true,
+              canViewGuestList: true
+            } : participantPermissions
           })),
           isPublic,
           isRecurring: recurrenceType !== "does_not_repeat",
@@ -271,11 +276,7 @@ function CreateAnEvent({ isOpen, onRequestClose }) {
             firstName: userData.firstName,
             lastName: userData.lastName,
             email: userData.email,
-          },
-          isSeries: isRecurring,
-          seriesId: isRecurring
-            ? `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
-            : null,
+          }
         };
 
         const createdEvent = await createEvent(event, token);
