@@ -31,20 +31,20 @@ export default function NavBarPublic() {
             setFilteredEvents([]);
             return;
         }
-    
+
         const currentDate = new Date();
-    
+
         const results = events
             .filter(event => event.title.toLowerCase().includes(search.toLowerCase()))
             .filter(event => event.startDate && new Date(event.startDate) >= currentDate)
             .filter(event => event.isPublic === true);
-    
+
         // Find the first recurring event after today
         const firstRecurringEvent = results.find(event => event.isRecurring === true);
-    
+
         // Combine the first recurring event (if found) with the rest of the results
         const nonRecurringEvents = results.filter(event => event.isRecurring === false);
-    
+
         setFilteredEvents(firstRecurringEvent ? [firstRecurringEvent, ...nonRecurringEvents] : nonRecurringEvents);
         console.log("Search Results:", { firstRecurringEvent, nonRecurringEvents });
     }, [search, events]);
@@ -52,7 +52,7 @@ export default function NavBarPublic() {
     return (
         <nav className="navbar flex justify-center items-center bg-gray-500 p-6 relative">
             <Link to="/">
-                <img src={logo} alt="Logo" className="h-8" />
+                <img src={logo} alt="Logo" className="h-16 w-auto" />
             </Link>
             <Link to="/events" className="btn btn-error text-white px-6 bg-[#DA4735] py-3 text-lg rounded-full mr-6">
                 Events
@@ -77,18 +77,18 @@ export default function NavBarPublic() {
                     <ul className="absolute top-12 left-0 w-full bg-white shadow-md rounded-md mt-1">
                         {filteredEvents.map((event) => (
                             <Link to={`/events/${event._id}`} key={event._id}>
-                            <li className="px-4 py-2 hover:bg-gray-200">
-                                
-                                <div className="avatar">
-                                    <div className="w-8 rounded">
-                                        <img
-                                            src={event.eventCover}
-                                            alt="Tailwind-CSS-Avatar-component" />
+                                <li className="px-4 py-2 hover:bg-gray-200">
+
+                                    <div className="avatar">
+                                        <div className="w-8 rounded">
+                                            <img
+                                                src={event.eventCover}
+                                                alt="Tailwind-CSS-Avatar-component" />
+                                        </div>
                                     </div>
-                                </div>
-                                <p>{event.title}</p>
-                                <p>{new Date(event.startDate).toLocaleString()}</p>
-                            </li>
+                                    <p>{event.title}</p>
+                                    <p>{new Date(event.startDate).toLocaleString()}</p>
+                                </li>
                             </Link>
                         ))}
                     </ul>

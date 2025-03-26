@@ -94,7 +94,7 @@ export default function NavBarPrivate() {
     return (
         <nav className="navbar flex justify-center items-center bg-gray-500 p-6 relative sticky">
             <Link to="/home">
-                <img src={logo} alt="Logo" className="h-8" />
+               <img src={logo} alt="Logo" className="h-16 w-auto" />
             </Link>
             <div className="relative">
                 <label className="input mr-6 flex items-center bg-white px-3 py-2 rounded-md shadow-sm">
