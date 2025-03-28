@@ -260,10 +260,13 @@ function CreateAnEvent({ isOpen, onRequestClose }) {
             email,
             status: email === userData.email ? "accepted" : "pending",
             role: email === userData.email ? "organizer" : "invitee",
-            permissions: email === userData.email ? {
-              canInviteOthers: true,
-              canViewGuestList: true
-            } : participantPermissions
+            permissions:
+              email === userData.email
+                ? {
+                    canInviteOthers: true,
+                    canViewGuestList: true,
+                  }
+                : participantPermissions,
           })),
           isPublic,
           isRecurring: recurrenceType !== "does_not_repeat",
@@ -276,7 +279,7 @@ function CreateAnEvent({ isOpen, onRequestClose }) {
             firstName: userData.firstName,
             lastName: userData.lastName,
             email: userData.email,
-          }
+          },
         };
 
         const createdEvent = await createEvent(event, token);

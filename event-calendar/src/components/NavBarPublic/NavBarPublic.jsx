@@ -25,7 +25,6 @@ export default function NavBarPublic() {
 
     fetchEvents();
   }, []);
-
   useEffect(() => {
     if (search.trim() === "") {
       setFilteredEvents([]);
@@ -35,9 +34,11 @@ export default function NavBarPublic() {
     const currentDate = new Date();
 
     const results = events
-      .filter((event) =>
-        event.title.toLowerCase().includes(search.toLowerCase())
-      )
+      .filter(
+        (event) =>
+          event.title &&
+          event.title.toLowerCase().includes(search.toLowerCase())
+      ) // Added null check for event.title
       .filter(
         (event) => event.startDate && new Date(event.startDate) >= currentDate
       )
