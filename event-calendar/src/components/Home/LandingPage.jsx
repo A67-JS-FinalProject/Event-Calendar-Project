@@ -90,7 +90,7 @@ function LandingPage() {
   ];
 
   return (
-    <div className="font-sans bg-white">
+    <div className="font-sans bg-gray-900 text-gray-100">
       <NavBarPublic />
 
       {/* Hero Section with Search and Auth */}
@@ -109,7 +109,7 @@ function LandingPage() {
           <div className="flex flex-row sm:flex-col justify-center gap-4">
             <a
               href="/login"
-              className=" cursor-pointer bg-white hover:bg-gray-100 text-[#DA4735] font-semibold py-4 px-8 rounded-full flex items-center justify-center gap-2 transition-colors duration-300"
+              className="cursor-pointer bg-white hover:bg-gray-100 text-[#DA4735] font-semibold py-4 px-8 rounded-full flex items-center justify-center gap-2 transition-colors duration-300"
             >
               <FaLockOpen /> Login
             </a>
@@ -124,24 +124,24 @@ function LandingPage() {
       </section>
 
       {/* Features Section */}
-      <section className="py-24 bg-white">
+      <section className="py-24 bg-gray-800">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-16 text-gray-800">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-16 text-white">
             Key Features
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
             {features.map((feature, index) => (
               <div
                 key={index}
-                className="bg-gray-50 p-8 rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300"
+                className="bg-gray-700 p-8 rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300"
               >
                 <div className="text-[#DA4735] text-5xl mb-6">
                   {feature.icon}
                 </div>
-                <h3 className="text-xl font-semibold mb-4 text-gray-800">
+                <h3 className="text-xl font-semibold mb-4 text-white">
                   {feature.title}
                 </h3>
-                <p className="text-gray-600 leading-relaxed">
+                <p className="text-gray-300 leading-relaxed">
                   {feature.description}
                 </p>
               </div>
@@ -151,9 +151,9 @@ function LandingPage() {
       </section>
 
       {/* How It Works */}
-      <section className="py-24 bg-gray-50">
+      <section className="py-24 bg-gray-900">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-16 text-gray-800">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-16 text-white">
             How It Works
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
@@ -162,10 +162,10 @@ function LandingPage() {
               <div className="bg-[#DA4735] text-white w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6 font-bold text-2xl">
                 1
               </div>
-              <h3 className="text-xl font-semibold mb-4 text-gray-800">
+              <h3 className="text-xl font-semibold mb-4 text-white">
                 Register or Login
               </h3>
-              <p className="text-gray-600 leading-relaxed">
+              <p className="text-gray-300 leading-relaxed">
                 Anonymous users can register for free or login to access their
                 private calendar area.
               </p>
@@ -176,10 +176,10 @@ function LandingPage() {
               <div className="bg-[#DA4735] text-white w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6 font-bold text-2xl">
                 2
               </div>
-              <h3 className="text-xl font-semibold mb-4 text-gray-800">
+              <h3 className="text-xl font-semibold mb-4 text-white">
                 Manage Your Calendar
               </h3>
-              <p className="text-gray-600 leading-relaxed">
+              <p className="text-gray-300 leading-relaxed">
                 Use our custom-built calendar views to create events, set up
                 recurring series, and organize with tags.
               </p>
@@ -190,10 +190,10 @@ function LandingPage() {
               <div className="bg-[#DA4735] text-white w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6 font-bold text-2xl">
                 3
               </div>
-              <h3 className="text-xl font-semibold mb-4 text-gray-800">
+              <h3 className="text-xl font-semibold mb-4 text-white">
                 Collaborate with Others
               </h3>
-              <p className="text-gray-600 leading-relaxed">
+              <p className="text-gray-300 leading-relaxed">
                 Search for users, invite them to events, and manage
                 participants. Accept or decline invitations you receive.
               </p>
@@ -203,10 +203,10 @@ function LandingPage() {
       </section>
 
       {/* About Us Section */}
-      <section className="py-24 bg-white">
+      <section className="py-24 bg-gray-800">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
               Meet Our Development Team
             </h2>
             <div className="w-24 h-1 bg-[#DA4735] mx-auto"></div>
@@ -216,21 +216,21 @@ function LandingPage() {
             {teamMembers.map((member, index) => (
               <div
                 key={index}
-                className="bg-white p-8 rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300 text-center"
+                className="bg-gray-700 p-8 rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300 text-center"
               >
-                <div className="w-32 h-32 bg-gray-200 rounded-full mx-auto mb-6 overflow-hidden">
-                  <div className="w-full h-full bg-black opacity-20 flex items-center justify-center">
+                <div className="w-32 h-32 bg-gray-600 rounded-full mx-auto mb-6 overflow-hidden">
+                  <div className="w-full h-full bg-black opacity-30 flex items-center justify-center">
                     <span className="text-4xl text-[#DA4735] font-bold">
                       {member.name.charAt(0)}
                     </span>
                   </div>
                 </div>
-                <h4 className="text-xl font-semibold text-gray-800 mb-2">
+                <h4 className="text-xl font-semibold text-white mb-2">
                   {member.name}
                 </h4>
                 <p className="text-[#DA4735] font-medium mb-4">{member.role}</p>
-                <p className="text-gray-600 mb-4">{member.bio}</p>
-                <p className="text-sm text-gray-500 italic">
+                <p className="text-gray-300 mb-4">{member.bio}</p>
+                <p className="text-sm text-gray-400 italic">
                   Fun fact: {member.funFact}
                 </p>
               </div>
@@ -240,22 +240,22 @@ function LandingPage() {
       </section>
 
       {/* FAQ Section */}
-      <section className="py-24 bg-gray-50">
+      <section className="py-24 bg-gray-900">
         <div className="container mx-auto px-4 max-w-4xl">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-16 text-gray-800">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-16 text-white">
             Frequently Asked Questions
           </h2>
           <div className="space-y-6">
             {faqs.map((faq, index) => (
               <div
                 key={index}
-                className="border border-gray-200 rounded-xl shadow-md overflow-hidden transition-shadow hover:shadow-lg duration-300"
+                className="border border-gray-700 rounded-xl shadow-md overflow-hidden transition-shadow hover:shadow-lg duration-300"
               >
                 <button
-                  className="w-full flex justify-between items-center p-6 text-left hover:bg-gray-50 transition-colors duration-200"
+                  className="w-full flex justify-between items-center p-6 text-left hover:bg-gray-800 transition-colors duration-200"
                   onClick={() => toggleFAQ(index)}
                 >
-                  <h3 className="text-lg font-semibold text-gray-800">
+                  <h3 className="text-lg font-semibold text-white">
                     {faq.question}
                   </h3>
                   {activeIndex === index ? (
@@ -265,7 +265,7 @@ function LandingPage() {
                   )}
                 </button>
                 {activeIndex === index && (
-                  <div className="px-8 pb-8 pt-4 text-gray-600 leading-relaxed">
+                  <div className="px-8 pb-8 pt-4 text-gray-300 leading-relaxed">
                     {faq.answer}
                   </div>
                 )}
