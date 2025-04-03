@@ -255,7 +255,7 @@ function CreateAnEvent({ isOpen, onRequestClose }) {
           ),
           location,
           description,
-          organizer: userData.email, // Add this line to set the organizer
+          organizer: userData.email,
           participants: participantEmails.map((email) => ({
             email,
             status: email === userData.email ? "accepted" : "pending",

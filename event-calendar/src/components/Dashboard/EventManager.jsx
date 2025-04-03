@@ -3,6 +3,8 @@ import { AppContext } from "../../store/app.context";
 import { getEventsByDateRange } from "../../services/eventService";
 import { Link } from "react-router-dom";
 import CreateAnEvent from "../CreateAEvent/CreateAnEvent";
+import { IoMdArrowRoundBack } from "react-icons/io";
+import { IoMdArrowRoundForward } from "react-icons/io";
 
 const EventManager = () => {
   const { appState } = useContext(AppContext);
@@ -10,6 +12,8 @@ const EventManager = () => {
   const [filter, setFilter] = useState("upcoming");
   const [loading, setLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [eventsPerPage] = useState(5); // Number of events per page
 
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
@@ -60,6 +64,18 @@ const EventManager = () => {
     }
   };
 
+  // Get current events for pagination
+  const filteredEvents = getFilteredEvents();
+  const indexOfLastEvent = currentPage * eventsPerPage;
+  const indexOfFirstEvent = indexOfLastEvent - eventsPerPage;
+  const currentEvents = filteredEvents.slice(
+    indexOfFirstEvent,
+    indexOfLastEvent
+  );
+
+  // Change page
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
   return (
     <div className="bg-white rounded-lg shadow-md p-6 w-full p-4 h-fit">
       <div className="fixed inset-0 flex items-center justify-center z-50 w-50 h-fit">
@@ -79,7 +95,10 @@ const EventManager = () => {
         {["upcoming", "past", "created"].map((filterOption) => (
           <button
             key={filterOption}
-            onClick={() => setFilter(filterOption)}
+            onClick={() => {
+              setFilter(filterOption);
+              setCurrentPage(1);
+            }}
             className={`px-4 py-2 rounded-lg capitalize text-sm font-medium transition-colors duration-200 ${
               filter === filterOption
                 ? "bg-[#DA4735] text-white"
@@ -95,7 +114,7 @@ const EventManager = () => {
         <div className="text-center py-8 text-gray-500">Loading events...</div>
       ) : (
         <div className="space-y-3">
-          {getFilteredEvents().map((event) => {
+          {currentEvents.map((event) => {
             const isCreator = event.createdBy?.email === appState.user?.email;
             const isInvited = event.participants?.some(
               (participant) =>
@@ -138,8 +157,59 @@ const EventManager = () => {
               </Link>
             );
           })}
-          {getFilteredEvents().length === 0 && (
+          {filteredEvents.length === 0 && (
             <p className="text-center text-gray-500 py-8">No events found</p>
+          )}
+
+          {/* Pagination controls */}
+          {filteredEvents.length > eventsPerPage && (
+            <div className="flex justify-center mt-6">
+              <nav className="inline-flex rounded-lg shadow-md">
+                <button
+                  onClick={() => paginate(currentPage - 1)}
+                  disabled={currentPage === 1}
+                  className={`px-4 py-2 rounded-l-lg transition-colors duration-200
+          ${
+            currentPage === 1
+              ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+              : "bg-white text-gray-700 hover:bg-gray-100"
+          }`}
+                >
+                  <IoMdArrowRoundBack className="text-xl" />
+                </button>
+                {Array.from({
+                  length: Math.ceil(filteredEvents.length / eventsPerPage),
+                }).map((_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => paginate(index + 1)}
+                    className={`px-4 py-2 transition-colors duration-200
+            ${
+              currentPage === index + 1
+                ? "bg-[#DA4735]  text-white font-semibold"
+                : "bg-white text-gray-700 hover:bg-gray-100"
+            }`}
+                  >
+                    {index + 1}
+                  </button>
+                ))}
+                <button
+                  onClick={() => paginate(currentPage + 1)}
+                  disabled={
+                    currentPage ===
+                    Math.ceil(filteredEvents.length / eventsPerPage)
+                  }
+                  className={`px-4 py-2 rounded-r-lg transition-colors duration-200
+          ${
+            currentPage === Math.ceil(filteredEvents.length / eventsPerPage)
+              ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+              : "bg-white text-gray-700 hover:bg-gray-100"
+          }`}
+                >
+                  <IoMdArrowRoundForward className="text-xl" />
+                </button>
+              </nav>
+            </div>
           )}
         </div>
       )}

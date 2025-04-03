@@ -10,6 +10,11 @@ const UserDashboard = () => {
   return (
     <>
       <div className="flex min-h-screen bg-white">
+        {/* Sidebar with Events */}
+        <div className="w-100 p-4 border-r border-gray-200 space-y-4">
+          <EventManager className="w-full h-full border border-gray-200 rounded-lg shadow-sm" />
+        </div>
+
         {/* Main Content */}
         <div className="flex-1 p-6">
           <header className="flex justify-between items-center mb-6">
@@ -18,21 +23,18 @@ const UserDashboard = () => {
             </h1>
           </header>
 
-          <div className="grid grid-rows-1 lg:grid-rows-1 ">
+          <div className="grid grid-rows-1 lg:grid-rows-1">
             {activeSection === "calendar" ? (
-              <>
-                <div className=" h-fit">
-                  <PersonalCalendar className="w-full w-fit border border-gray-200 rounded-lg shadow-sm" />
-                </div>
-                <div className="flex row space-x-6 p-10">
-                  <EventManager className="w-full h-full border border-gray-200 rounded-lg shadow-sm" />
-                  <EventInvitationsList className="border border-gray-200 rounded-lg shadow-sm p-4 bg-white" />
-                </div>
-              </>
+              <div className="h-fit">
+                <PersonalCalendar className="w-full border border-gray-200 rounded-lg shadow-sm" />
+              </div>
             ) : (
-              <div className="col-span-3">{/* Settings content here */}</div>
+              <div className="col-span-3"></div>
             )}
           </div>
+        </div>
+        <div className="w-100 p-4 m border-r border-gray-200 space-y-4">
+          <EventInvitationsList className="w-full border border-gray-200 rounded-lg shadow-sm p-4 bg-white" />
         </div>
       </div>
     </>

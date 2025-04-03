@@ -241,7 +241,7 @@ const Home = () => {
         {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((day) => (
           <div
             key={day}
-            className="text-sm font-semibold text-black-600 text-center pb-2"
+            className="text-sm font-semibold text-gray-600 text-center pb-2 border-b border-gray-200 "
           >
             {day}
           </div>
@@ -257,23 +257,33 @@ const Home = () => {
             date.day
           );
 
+          const isToday =
+            selectedDate.getDate() === date.day &&
+            date.isCurrentMonth &&
+            selectedDate.getMonth() === currentDate.getMonth() &&
+            selectedDate.getFullYear() === currentDate.getFullYear();
+
           return (
             <div
               key={i}
-              className={`min-h-16 p-1 border rounded text-sm 
-                ${date.isCurrentMonth ? "text-black" : "text-black"} 
-                hover:bg-[#f7d9d4]
+              className={`min-h-20 p-2 border rounded-lg transition-colors duration-200
+                ${date.isCurrentMonth ? "text-gray-800" : "text-gray-400"}
+                hover:bg-red-50/20 cursor-pointer
                 ${
-                  selectedDate.getDate() === date.day && date.isCurrentMonth
-                    ? "bg-[#DA4735] border-[#DA4735] text-black"
-                    : ""
-                }`}
+                  isToday
+                    ? "bg-red-500 text-white font-semibold border-red-500"
+                    : "border border-gray-200"
+                }
+                ${date.isCurrentMonth ? "relative" : ""}`}
               onClick={() => date.isCurrentMonth && handleDateClick(date.day)}
             >
-              <div className="text-right p-1">{date.day}</div>
-              <div className="overflow-hidden max-h-12">
+              <div className="text-right text-sm font-medium">{date.day}</div>
+              <div className="overflow-hidden max-h-12 mt-1">
                 {renderEvents(currentDate)}
               </div>
+              {isToday && (
+                <div className="absolute top-1 left-1 bg-white rounded-full w-2 h-2"></div>
+              )}
             </div>
           );
         })}
