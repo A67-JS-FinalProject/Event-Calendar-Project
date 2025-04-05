@@ -3,12 +3,15 @@ import { AppContext } from "../../store/app.context";
 import PersonalCalendar from "./PersonalCalendar";
 import EventManager from "./EventManager";
 import EventInvitationsList from "../Events/EventInvitationsList";
+import NavBarPrivate from "../NavBarPrivate/NavBarPrivate";
+
 const UserDashboard = () => {
   const { appState } = useContext(AppContext);
   const [activeSection] = useState("calendar");
 
   return (
     <>
+    <NavBarPrivate />
       <div className="flex min-h-screen bg-white">
         {/* Sidebar with Events */}
         <div className="w-100 p-4 border-r border-gray-200 space-y-4">

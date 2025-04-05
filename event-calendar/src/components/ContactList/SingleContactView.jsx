@@ -122,6 +122,8 @@ function SingleContactView() {
     }
 
     return (
+        <>
+        <NavBarPrivate />
         <div className="flex">
             {/* Sidebar */}
             <div className="w-1/5 bg-gray-800 text-white p-4 h-window">
@@ -145,7 +147,6 @@ function SingleContactView() {
 
             {/* Main Content Area */}
             <div className="flex-1 p-10">
-                <NavBarPrivate />
                 <h1 className="text-2xl font-bold mb-6 mt-6 text-center">Contacts in {listName}</h1>
                 <div className="flex justify-end">
                     <button onClick={() => setModalOpen(true)} className="btn bg-gray-800 text-white btn-info mb-5 mr-7">Add Contacts</button>
@@ -198,6 +199,9 @@ function SingleContactView() {
                 />
             </div>
         </div>
+        
+        </>
+       
     );
 }
 

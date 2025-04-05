@@ -91,7 +91,7 @@ const Register = () => {
       <NavBarPublic />
       <div className="flex justify-center items-center min-h-screen bg-gray-50">
         <form
-          className="flex flex-col p-8 w-full max-w-md bg-white shadow-lg rounded-xl border border-gray-100"
+          className="flex flex-col p-8 w-full max-w-md bg-white shadow-lg rounded-xl border border-gray-100 text-black"
           onSubmit={handleRegister}
         >
           <h2 className="text-3xl font-bold mb-6 text-center text-[#DA4735]">
